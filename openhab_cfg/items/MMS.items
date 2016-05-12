@@ -4,32 +4,39 @@ Number LZ_Pending_Off_Time
 String LZ1Sts {mqtt="<[mosquitto:Lighting/LZ1_Sts:state:default]"}
 String LZ1Cmd_in {mqtt="<[mosquitto:Lighting/LZ1_Cmd:state:default]"}
 Switch LZ1Cmd {mqtt=">[mosquitto:Lighting/LZ1_Cmd:command:*:default]"}
-Number LZ1Timer "Light Zone 1 Timer [%d]" {mqtt=">[mosquitto:Lighting/LZ1_Timer:command:*:default]"}
+Number LZ1Timer {mqtt=">[mosquitto:Lighting/LZ1_Timer:command:*:default]"}
 
 String LZ2Sts {mqtt="<[mosquitto:Lighting/LZ2_Sts:state:default]"}
+String LZ2Cmd_in {mqtt="<[mosquitto:Lighting/LZ2_Cmd:state:default]"}
 Switch LZ2Cmd {mqtt=">[mosquitto:Lighting/LZ2_Cmd:command:*:default]"}
-Number LZ2Timer "Light Zone 2 Timer [%d]" {mqtt=">[mosquitto:Lighting/LZ2_Timer:command:*:default]"}
+Number LZ2Timer {mqtt=">[mosquitto:Lighting/LZ2_Timer:command:*:default]"}
 
 String LZ3Sts {mqtt="<[mosquitto:Lighting/LZ3_Sts:state:default]"}
+String LZ3Cmd_in {mqtt="<[mosquitto:Lighting/LZ3_Cmd:state:default]"}
 Switch LZ3Cmd {mqtt=">[mosquitto:Lighting/LZ3_Cmd:command:*:default]"}
-Number LZ3Timer "Light Zone 3 Timer [%d]" {mqtt=">[mosquitto:Lighting/LZ3_Timer:command:*:default]"}
+Number LZ3Timer {mqtt=">[mosquitto:Lighting/LZ3_Timer:command:*:default]"}
 
 String LZ4Sts {mqtt="<[mosquitto:Lighting/LZ4_Sts:state:default]"}
+String LZ4Cmd_in {mqtt="<[mosquitto:Lighting/LZ4_Cmd:state:default]"}
 Switch LZ4Cmd {mqtt=">[mosquitto:Lighting/LZ4_Cmd:command:*:default]"}
-Number LZ4Timer "Light Zone 4 Timer [%d]" {mqtt=">[mosquitto:Lighting/LZ4_Timer:command:*:default]"}
+Number LZ4Timer {mqtt=">[mosquitto:Lighting/LZ4_Timer:command:*:default]"}
 
 String LZ5Sts {mqtt="<[mosquitto:Lighting/LZ5_Sts:state:default]"}
+String LZ5Cmd_in {mqtt="<[mosquitto:Lighting/LZ5_Cmd:state:default]"}
 Switch LZ5Cmd {mqtt=">[mosquitto:Lighting/LZ5_Cmd:command:*:default]"}
-Number LZ5Timer "Light Zone 5 Timer [%d]" {mqtt=">[mosquitto:Lighting/LZ5_Timer:command:*:default]"}
+Number LZ5Timer {mqtt=">[mosquitto:Lighting/LZ5_Timer:command:*:default]"}
 
 String LZ6Sts {mqtt="<[mosquitto:Lighting/LZ6_Sts:state:default]"}
+String LZ6Cmd_in {mqtt="<[mosquitto:Lighting/LZ6_Cmd:state:default]"}
 Switch LZ6Cmd {mqtt=">[mosquitto:Lighting/LZ6_Cmd:command:*:default]"}
-Number LZ6Timer "Light Zone 6 Timer [%d]" {mqtt=">[mosquitto:Lighting/LZ6_Timer:command:*:default]"}
+Number LZ6Timer {mqtt=">[mosquitto:Lighting/LZ6_Timer:command:*:default]"}
 
 String LZ7Sts {mqtt="<[mosquitto:Lighting/LZ7_Sts:state:default]"}
+String LZ7Cmd_in {mqtt="<[mosquitto:Lighting/LZ7_Cmd:state:default]"}
 Switch LZ7Cmd {mqtt=">[mosquitto:Lighting/LZ7_Cmd:command:*:default]"}
-Number LZ7Timer "Light Zone 7 Timer [%d]" {mqtt=">[mosquitto:Lighting/LZ7_Timer:command:*:default]"}
+Number LZ7Timer {mqtt=">[mosquitto:Lighting/LZ7_Timer:command:*:default]"}
 
 String LZ8Sts {mqtt="<[mosquitto:Lighting/LZ8_Sts:state:default]"}
+String LZ8Cmd_in {mqtt="<[mosquitto:Lighting/LZ8_Cmd:state:default]"}
 Switch LZ8Cmd {mqtt=">[mosquitto:Lighting/LZ8_Cmd:command:*:default]"}
-Number LZ8Timer "Light Zone 8 Timer [%d]" {mqtt=">[mosquitto:Lighting/LZ8_Timer:command:*:default]"}
+Number LZ8Timer {mqtt=">[mosquitto:Lighting/LZ8_Timer:command:*:default]"}

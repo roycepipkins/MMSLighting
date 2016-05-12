@@ -2,11 +2,6 @@ rule "System Startup"
 when
 	System started
 then
-	var Number max_time = 480
-	var Number pending_off_time = 5
-	LZ_Max_Time.sendCommand(max_time)
-	LZ_Pending_Off_Time.sendCommand(pending_off_time)
-	
 	LZ1Timer.sendCommand(0)
 	LZ2Timer.sendCommand(0)
 	LZ3Timer.sendCommand(0)

@@ -1,5 +1,10 @@
 import org.openhab.core.library.types.DecimalType
 import org.openhab.core.library.types.NumberItem
+import org.openhab.core.types.UnDefType
+
+var Number max_time = 480
+var Number pending_time = 5
+var Number step_time = 60
 
 //Each time the an ON command is published we
 //should increment the amount of time remaining
@@ -7,10 +12,11 @@ rule "LZ1IncrementTime"
 when
 	Item LZ1Cmd_in received update "ON"
 then
-	var Number new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
-	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ1Timer.state instanceof UnDefType))
+		new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
 	
-	new_time = new_time + 60
+	new_time = new_time + step_time
 	if (new_time > max_time) new_time = max_time
 	LZ1Timer.sendCommand(new_time)
 end
@@ -22,8 +28,9 @@ rule "LZ1TimerAutoOff"
 when
 	Item LZ1Timer received command
 then
-	var Number new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ1Timer.state instanceof UnDefType))
+		new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
 	
 	if (new_time <= pending_time)
 	{
@@ -41,9 +48,11 @@ rule "LZ1SetTimerWhenOn"
 when
 	Item LZ1Sts received update "On"
 then
-	var Number timer_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
+	var Number timer_time = 0
+	if (!(LZ1Timer.state instanceof UnDefType))
+		timer_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
 	if (timer_time == 0)
-		LZ1Timer.sendCommand(60)
+		LZ1Timer.sendCommand(step_time)
 end
 
 //If for any reason a light enters Pending_Off status
@@ -52,7 +61,6 @@ rule "LZ1ResetTimeWhenPendingOff"
 when
 	Item LZ1Sts received update "Pending_Off"
 then
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
 	LZ1Timer.sendCommand(pending_time)
 end
 
@@ -75,63 +83,63 @@ when
 then
 	var Number new_time
 	
-	new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = 0
+	if (!(LZ1Timer.state instanceof UnDefType))
+		new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType 
 	new_time = new_time - 1
-	if (new_time < 0) 
-		new_time = 0
-	else
+	if (new_time >= 0) 
 		LZ1Timer.sendCommand(new_time)
 	
-	new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = 0
+	if (!(LZ2Timer.state instanceof UnDefType))
+		new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType 
 	new_time = new_time - 1
-	if (new_time < 0) 
-		new_time = 0
-	else
+	if (new_time >= 0) 
 		LZ2Timer.sendCommand(new_time)
 		
-	new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = 0
+	if (!(LZ3Timer.state instanceof UnDefType))
+		new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType 
 	new_time = new_time - 1
-	if (new_time < 0) 
-		new_time = 0
-	else
+	if (new_time >= 0) 
 		LZ3Timer.sendCommand(new_time)
-
-	new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType 
+		
+	new_time = 0
+	if (!(LZ4Timer.state instanceof UnDefType))
+		new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType 
 	new_time = new_time - 1
-	if (new_time < 0) 
-		new_time = 0
-	else
+	if (new_time >= 0) 
+		LZ4Timer.sendCommand(new_time)
+		
+	new_time = 0
+	if (!(LZ5Timer.state instanceof UnDefType))
+		new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time >= 0) 
 		LZ5Timer.sendCommand(new_time)
-	
-	new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType 
+		
+	new_time = 0
+	if (!(LZ6Timer.state instanceof UnDefType))
+		new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType 
 	new_time = new_time - 1
-	if (new_time < 0) 
-		new_time = 0
-	else
-		LZ5Timer.sendCommand(new_time)
-	
-	new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType 
-	new_time = new_time - 1
-	if (new_time < 0) 
-		new_time = 0
-	else
+	if (new_time >= 0) 
 		LZ6Timer.sendCommand(new_time)
-	
-	new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType 
+		
+	new_time = 0
+	if (!(LZ7Timer.state instanceof UnDefType))
+		new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType 
 	new_time = new_time - 1
-	if (new_time < 0) 
-		new_time = 0
-	else
+	if (new_time >= 0) 
 		LZ7Timer.sendCommand(new_time)
-	
-	new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType 
+		
+	new_time = 0
+	if (!(LZ8Timer.state instanceof UnDefType))
+		new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType 
 	new_time = new_time - 1
-	if (new_time < 0) 
-		new_time = 0
-	else
+	if (new_time >= 0) 
 		LZ8Timer.sendCommand(new_time)
-
 end
+
 
 //Each time the an ON command is published we
 //should increment the amount of time remaining
@@ -139,10 +147,11 @@ rule "LZ2IncrementTime"
 when
 	Item LZ2Cmd_in received update "ON"
 then
-	var Number new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
-	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ2Timer.state instanceof UnDefType))
+		new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
 	
-	new_time = new_time + 60
+	new_time = new_time + step_time
 	if (new_time > max_time) new_time = max_time
 	LZ2Timer.sendCommand(new_time)
 end
@@ -154,8 +163,9 @@ rule "LZ2TimerAutoOff"
 when
 	Item LZ2Timer received command
 then
-	var Number new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ2Timer.state instanceof UnDefType))
+		new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
 	
 	if (new_time <= pending_time)
 	{
@@ -173,9 +183,11 @@ rule "LZ2SetTimerWhenOn"
 when
 	Item LZ2Sts received update "On"
 then
-	var Number timer_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
+	var Number timer_time = 0
+	if (!(LZ2Timer.state instanceof UnDefType))
+		timer_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
 	if (timer_time == 0)
-		LZ2Timer.sendCommand(60)
+		LZ2Timer.sendCommand(step_time)
 end
 
 //If for any reason a light enters Pending_Off status
@@ -184,7 +196,6 @@ rule "LZ2ResetTimeWhenPendingOff"
 when
 	Item LZ2Sts received update "Pending_Off"
 then
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
 	LZ2Timer.sendCommand(pending_time)
 end
 
@@ -203,10 +214,11 @@ rule "LZ3IncrementTime"
 when
 	Item LZ3Cmd_in received update "ON"
 then
-	var Number new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
-	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ3Timer.state instanceof UnDefType))
+		new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
 	
-	new_time = new_time + 60
+	new_time = new_time + step_time
 	if (new_time > max_time) new_time = max_time
 	LZ3Timer.sendCommand(new_time)
 end
@@ -218,8 +230,9 @@ rule "LZ3TimerAutoOff"
 when
 	Item LZ3Timer received command
 then
-	var Number new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ3Timer.state instanceof UnDefType))
+		new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
 	
 	if (new_time <= pending_time)
 	{
@@ -237,9 +250,11 @@ rule "LZ3SetTimerWhenOn"
 when
 	Item LZ3Sts received update "On"
 then
-	var Number timer_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
+	var Number timer_time = 0
+	if (!(LZ3Timer.state instanceof UnDefType))
+		timer_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
 	if (timer_time == 0)
-		LZ3Timer.sendCommand(60)
+		LZ3Timer.sendCommand(step_time)
 end
 
 //If for any reason a light enters Pending_Off status
@@ -248,7 +263,6 @@ rule "LZ3ResetTimeWhenPendingOff"
 when
 	Item LZ3Sts received update "Pending_Off"
 then
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
 	LZ3Timer.sendCommand(pending_time)
 end
 
@@ -267,10 +281,11 @@ rule "LZ4IncrementTime"
 when
 	Item LZ4Cmd_in received update "ON"
 then
-	var Number new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
-	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ4Timer.state instanceof UnDefType))
+		new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
 	
-	new_time = new_time + 60
+	new_time = new_time + step_time
 	if (new_time > max_time) new_time = max_time
 	LZ4Timer.sendCommand(new_time)
 end
@@ -282,8 +297,9 @@ rule "LZ4TimerAutoOff"
 when
 	Item LZ4Timer received command
 then
-	var Number new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ4Timer.state instanceof UnDefType))
+		new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
 	
 	if (new_time <= pending_time)
 	{
@@ -301,9 +317,11 @@ rule "LZ4SetTimerWhenOn"
 when
 	Item LZ4Sts received update "On"
 then
-	var Number timer_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
+	var Number timer_time = 0
+	if (!(LZ4Timer.state instanceof UnDefType))
+		timer_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
 	if (timer_time == 0)
-		LZ4Timer.sendCommand(60)
+		LZ4Timer.sendCommand(step_time)
 end
 
 //If for any reason a light enters Pending_Off status
@@ -312,7 +330,6 @@ rule "LZ4ResetTimeWhenPendingOff"
 when
 	Item LZ4Sts received update "Pending_Off"
 then
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
 	LZ4Timer.sendCommand(pending_time)
 end
 
@@ -331,10 +348,11 @@ rule "LZ5IncrementTime"
 when
 	Item LZ5Cmd_in received update "ON"
 then
-	var Number new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
-	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ5Timer.state instanceof UnDefType))
+		new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
 	
-	new_time = new_time + 60
+	new_time = new_time + step_time
 	if (new_time > max_time) new_time = max_time
 	LZ5Timer.sendCommand(new_time)
 end
@@ -346,8 +364,9 @@ rule "LZ5TimerAutoOff"
 when
 	Item LZ5Timer received command
 then
-	var Number new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ5Timer.state instanceof UnDefType))
+		new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
 	
 	if (new_time <= pending_time)
 	{
@@ -365,9 +384,11 @@ rule "LZ5SetTimerWhenOn"
 when
 	Item LZ5Sts received update "On"
 then
-	var Number timer_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
+	var Number timer_time = 0
+	if (!(LZ5Timer.state instanceof UnDefType))
+		timer_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
 	if (timer_time == 0)
-		LZ5Timer.sendCommand(60)
+		LZ5Timer.sendCommand(step_time)
 end
 
 //If for any reason a light enters Pending_Off status
@@ -376,7 +397,6 @@ rule "LZ5ResetTimeWhenPendingOff"
 when
 	Item LZ5Sts received update "Pending_Off"
 then
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
 	LZ5Timer.sendCommand(pending_time)
 end
 
@@ -395,10 +415,11 @@ rule "LZ6IncrementTime"
 when
 	Item LZ6Cmd_in received update "ON"
 then
-	var Number new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
-	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ6Timer.state instanceof UnDefType))
+		new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
 	
-	new_time = new_time + 60
+	new_time = new_time + step_time
 	if (new_time > max_time) new_time = max_time
 	LZ6Timer.sendCommand(new_time)
 end
@@ -410,8 +431,9 @@ rule "LZ6TimerAutoOff"
 when
 	Item LZ6Timer received command
 then
-	var Number new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ6Timer.state instanceof UnDefType))
+		new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
 	
 	if (new_time <= pending_time)
 	{
@@ -429,9 +451,11 @@ rule "LZ6SetTimerWhenOn"
 when
 	Item LZ6Sts received update "On"
 then
-	var Number timer_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
+	var Number timer_time = 0
+	if (!(LZ6Timer.state instanceof UnDefType))
+		timer_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
 	if (timer_time == 0)
-		LZ6Timer.sendCommand(60)
+		LZ6Timer.sendCommand(step_time)
 end
 
 //If for any reason a light enters Pending_Off status
@@ -440,7 +464,6 @@ rule "LZ6ResetTimeWhenPendingOff"
 when
 	Item LZ6Sts received update "Pending_Off"
 then
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
 	LZ6Timer.sendCommand(pending_time)
 end
 
@@ -459,10 +482,11 @@ rule "LZ7IncrementTime"
 when
 	Item LZ7Cmd_in received update "ON"
 then
-	var Number new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
-	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ7Timer.state instanceof UnDefType))
+		new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
 	
-	new_time = new_time + 60
+	new_time = new_time + step_time
 	if (new_time > max_time) new_time = max_time
 	LZ7Timer.sendCommand(new_time)
 end
@@ -474,8 +498,9 @@ rule "LZ7TimerAutoOff"
 when
 	Item LZ7Timer received command
 then
-	var Number new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ7Timer.state instanceof UnDefType))
+		new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
 	
 	if (new_time <= pending_time)
 	{
@@ -493,9 +518,11 @@ rule "LZ7SetTimerWhenOn"
 when
 	Item LZ7Sts received update "On"
 then
-	var Number timer_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
+	var Number timer_time = 0
+	if (!(LZ7Timer.state instanceof UnDefType))
+		timer_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
 	if (timer_time == 0)
-		LZ7Timer.sendCommand(60)
+		LZ7Timer.sendCommand(step_time)
 end
 
 //If for any reason a light enters Pending_Off status
@@ -504,7 +531,6 @@ rule "LZ7ResetTimeWhenPendingOff"
 when
 	Item LZ7Sts received update "Pending_Off"
 then
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
 	LZ7Timer.sendCommand(pending_time)
 end
 
@@ -523,10 +549,11 @@ rule "LZ8IncrementTime"
 when
 	Item LZ8Cmd_in received update "ON"
 then
-	var Number new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
-	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ8Timer.state instanceof UnDefType))
+		new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
 	
-	new_time = new_time + 60
+	new_time = new_time + step_time
 	if (new_time > max_time) new_time = max_time
 	LZ8Timer.sendCommand(new_time)
 end
@@ -538,8 +565,9 @@ rule "LZ8TimerAutoOff"
 when
 	Item LZ8Timer received command
 then
-	var Number new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	var Number new_time = 0
+	if (!(LZ8Timer.state instanceof UnDefType))
+		new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
 	
 	if (new_time <= pending_time)
 	{
@@ -557,9 +585,11 @@ rule "LZ8SetTimerWhenOn"
 when
 	Item LZ8Sts received update "On"
 then
-	var Number timer_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
+	var Number timer_time = 0
+	if (!(LZ8Timer.state instanceof UnDefType))
+		timer_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
 	if (timer_time == 0)
-		LZ8Timer.sendCommand(60)
+		LZ8Timer.sendCommand(step_time)
 end
 
 //If for any reason a light enters Pending_Off status
@@ -568,7 +598,6 @@ rule "LZ8ResetTimeWhenPendingOff"
 when
 	Item LZ8Sts received update "Pending_Off"
 then
-	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
 	LZ8Timer.sendCommand(pending_time)
 end
 
@@ -580,5 +609,3 @@ when
 then
 	LZ8Timer.sendCommand(0)
 end
-
-	

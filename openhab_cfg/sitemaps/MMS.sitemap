@@ -1,27 +1,35 @@
 sitemap name label="MMS" {
 	Frame {
 		Text item=LZ1Sts label="Light Zone 1 Status [%s]"
-		Setpoint item=LZ1Timer minValue=0 maxValue=480 step=60
+		Text item=LZ1Timer label="Light Zone 1 Timer [%d mins]"
+		Switch item=LZ1Cmd label="Light Zone 1 Command" mappings=[ON="Add Time", OFF="Off"]
 		
 		Text item=LZ2Sts label="Light Zone 2 Status [%s]"
-		Setpoint item=LZ2Timer minValue=0 maxValue=480 step=60
+		Text item=LZ2Timer label="Light Zone 2 Timer [%d mins]"
+		Switch item=LZ2Cmd label="Light Zone 2 Command" mappings=[ON="Add Time", OFF="Off"]
 		
 		Text item=LZ3Sts label="Light Zone 3 Status [%s]"
-		Setpoint item=LZ3Timer minValue=0 maxValue=480 step=60
+		Text item=LZ3Timer label="Light Zone 3 Timer [%d mins]"
+		Switch item=LZ3Cmd label="Light Zone 3 Command" mappings=[ON="Add Time", OFF="Off"]
 		
 		Text item=LZ4Sts label="Light Zone 4 Status [%s]"
-		Setpoint item=LZ4Timer minValue=0 maxValue=480 step=60
+		Text item=LZ4Timer label="Light Zone 4 Timer [%d mins]"
+		Switch item=LZ4Cmd label="Light Zone 4 Command" mappings=[ON="Add Time", OFF="Off"]
 		
 		Text item=LZ5Sts label="Light Zone 5 Status [%s]"
-		Setpoint item=LZ5Timer minValue=0 maxValue=480 step=60
+		Text item=LZ5Timer label="Light Zone 5 Timer [%d mins]"
+		Switch item=LZ5Cmd label="Light Zone 5 Command" mappings=[ON="Add Time", OFF="Off"]
 		
 		Text item=LZ6Sts label="Light Zone 6 Status [%s]"
-		Setpoint item=LZ6Timer minValue=0 maxValue=480 step=60
+		Text item=LZ6Timer label="Light Zone 6 Timer [%d mins]"
+		Switch item=LZ6Cmd label="Light Zone 6 Command" mappings=[ON="Add Time", OFF="Off"]
 		
 		Text item=LZ7Sts label="Light Zone 7 Status [%s]"
-		Setpoint item=LZ7Timer minValue=0 maxValue=480 step=60
+		Text item=LZ7Timer label="Light Zone 7 Timer [%d mins]"
+		Switch item=LZ7Cmd label="Light Zone 7 Command" mappings=[ON="Add Time", OFF="Off"]
 		
 		Text item=LZ8Sts label="Light Zone 8 Status [%s]"
-		Setpoint item=LZ8Timer minValue=0 maxValue=480 step=60
+		Text item=LZ8Timer label="Light Zone 8 Timer [%d mins]"
+		Switch item=LZ8Cmd label="Light Zone 8 Command" mappings=[ON="Add Time", OFF="Off"]
 	}
 }
