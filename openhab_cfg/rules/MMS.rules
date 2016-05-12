@@ -1,0 +1,584 @@
+import org.openhab.core.library.types.DecimalType
+import org.openhab.core.library.types.NumberItem
+
+//Each time the an ON command is published we
+//should increment the amount of time remaining
+rule "LZ1IncrementTime"
+when
+	Item LZ1Cmd_in received update "ON"
+then
+	var Number new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
+	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	
+	new_time = new_time + 60
+	if (new_time > max_time) new_time = max_time
+	LZ1Timer.sendCommand(new_time)
+end
+
+//When the timer gets all the way to the Pending_Off time value
+//we should send the OFF command to the Master COntrol Panel
+//so that it actually enters Pending_Off status
+rule "LZ1TimerAutoOff"
+when
+	Item LZ1Timer received command
+then
+	var Number new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	
+	if (new_time <= pending_time)
+	{
+		if (LZ1Sts.state == "On")
+		{
+			LZ1Cmd.sendCommand(OFF)
+		}	
+	}
+end
+
+//The Master Control Panel buttons don't publish MQTT commands
+//So we need to detect the status and some time if there
+//isn't already some time setup
+rule "LZ1SetTimerWhenOn"
+when
+	Item LZ1Sts received update "On"
+then
+	var Number timer_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType
+	if (timer_time == 0)
+		LZ1Timer.sendCommand(60)
+end
+
+//If for any reason a light enters Pending_Off status
+//we should reset the timer to the Pending_Off time value
+rule "LZ1ResetTimeWhenPendingOff"
+when
+	Item LZ1Sts received update "Pending_Off"
+then
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	LZ1Timer.sendCommand(pending_time)
+end
+
+//If for any reason a light enters Off status
+//we should reset the timer to zero
+rule "LZ1ZeroTimerWhenOff"
+when
+	Item LZ1Sts received update "Off"
+then
+	LZ1Timer.sendCommand(0)
+end
+
+	
+//The timer is decremented on a 1 minute cron job
+//This means its only accurate to +/- 1 min
+//but that is fine for this application
+rule "DecrementTime"
+when 
+	Time cron "0 0/1 * * * ?"
+then
+	var Number new_time
+	
+	new_time = LZ1Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time < 0) 
+		new_time = 0
+	else
+		LZ1Timer.sendCommand(new_time)
+	
+	new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time < 0) 
+		new_time = 0
+	else
+		LZ2Timer.sendCommand(new_time)
+		
+	new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time < 0) 
+		new_time = 0
+	else
+		LZ3Timer.sendCommand(new_time)
+
+	new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time < 0) 
+		new_time = 0
+	else
+		LZ5Timer.sendCommand(new_time)
+	
+	new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time < 0) 
+		new_time = 0
+	else
+		LZ5Timer.sendCommand(new_time)
+	
+	new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time < 0) 
+		new_time = 0
+	else
+		LZ6Timer.sendCommand(new_time)
+	
+	new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time < 0) 
+		new_time = 0
+	else
+		LZ7Timer.sendCommand(new_time)
+	
+	new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType 
+	new_time = new_time - 1
+	if (new_time < 0) 
+		new_time = 0
+	else
+		LZ8Timer.sendCommand(new_time)
+
+end
+
+//Each time the an ON command is published we
+//should increment the amount of time remaining
+rule "LZ2IncrementTime"
+when
+	Item LZ2Cmd_in received update "ON"
+then
+	var Number new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
+	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	
+	new_time = new_time + 60
+	if (new_time > max_time) new_time = max_time
+	LZ2Timer.sendCommand(new_time)
+end
+
+//When the timer gets all the way to the Pending_Off time value
+//we should send the OFF command to the Master COntrol Panel
+//so that it actually enters Pending_Off status
+rule "LZ2TimerAutoOff"
+when
+	Item LZ2Timer received command
+then
+	var Number new_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	
+	if (new_time <= pending_time)
+	{
+		if (LZ2Sts.state == "On")
+		{
+			LZ2Cmd.sendCommand(OFF)
+		}	
+	}
+end
+
+//The Master Control Panel buttons don't publish MQTT commands
+//So we need to detect the status and some time if there
+//isn't already some time setup
+rule "LZ2SetTimerWhenOn"
+when
+	Item LZ2Sts received update "On"
+then
+	var Number timer_time = LZ2Timer.state as org.openhab.core.library.types.DecimalType
+	if (timer_time == 0)
+		LZ2Timer.sendCommand(60)
+end
+
+//If for any reason a light enters Pending_Off status
+//we should reset the timer to the Pending_Off time value
+rule "LZ2ResetTimeWhenPendingOff"
+when
+	Item LZ2Sts received update "Pending_Off"
+then
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	LZ2Timer.sendCommand(pending_time)
+end
+
+//If for any reason a light enters Off status
+//we should reset the timer to zero
+rule "LZ2ZeroTimerWhenOff"
+when
+	Item LZ2Sts received update "Off"
+then
+	LZ2Timer.sendCommand(0)
+end
+
+//Each time the an ON command is published we
+//should increment the amount of time remaining
+rule "LZ3IncrementTime"
+when
+	Item LZ3Cmd_in received update "ON"
+then
+	var Number new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
+	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	
+	new_time = new_time + 60
+	if (new_time > max_time) new_time = max_time
+	LZ3Timer.sendCommand(new_time)
+end
+
+//When the timer gets all the way to the Pending_Off time value
+//we should send the OFF command to the Master COntrol Panel
+//so that it actually enters Pending_Off status
+rule "LZ3TimerAutoOff"
+when
+	Item LZ3Timer received command
+then
+	var Number new_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	
+	if (new_time <= pending_time)
+	{
+		if (LZ3Sts.state == "On")
+		{
+			LZ3Cmd.sendCommand(OFF)
+		}	
+	}
+end
+
+//The Master Control Panel buttons don't publish MQTT commands
+//So we need to detect the status and some time if there
+//isn't already some time setup
+rule "LZ3SetTimerWhenOn"
+when
+	Item LZ3Sts received update "On"
+then
+	var Number timer_time = LZ3Timer.state as org.openhab.core.library.types.DecimalType
+	if (timer_time == 0)
+		LZ3Timer.sendCommand(60)
+end
+
+//If for any reason a light enters Pending_Off status
+//we should reset the timer to the Pending_Off time value
+rule "LZ3ResetTimeWhenPendingOff"
+when
+	Item LZ3Sts received update "Pending_Off"
+then
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	LZ3Timer.sendCommand(pending_time)
+end
+
+//If for any reason a light enters Off status
+//we should reset the timer to zero
+rule "LZ3ZeroTimerWhenOff"
+when
+	Item LZ3Sts received update "Off"
+then
+	LZ3Timer.sendCommand(0)
+end
+
+//Each time the an ON command is published we
+//should increment the amount of time remaining
+rule "LZ4IncrementTime"
+when
+	Item LZ4Cmd_in received update "ON"
+then
+	var Number new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
+	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	
+	new_time = new_time + 60
+	if (new_time > max_time) new_time = max_time
+	LZ4Timer.sendCommand(new_time)
+end
+
+//When the timer gets all the way to the Pending_Off time value
+//we should send the OFF command to the Master COntrol Panel
+//so that it actually enters Pending_Off status
+rule "LZ4TimerAutoOff"
+when
+	Item LZ4Timer received command
+then
+	var Number new_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	
+	if (new_time <= pending_time)
+	{
+		if (LZ4Sts.state == "On")
+		{
+			LZ4Cmd.sendCommand(OFF)
+		}	
+	}
+end
+
+//The Master Control Panel buttons don't publish MQTT commands
+//So we need to detect the status and some time if there
+//isn't already some time setup
+rule "LZ4SetTimerWhenOn"
+when
+	Item LZ4Sts received update "On"
+then
+	var Number timer_time = LZ4Timer.state as org.openhab.core.library.types.DecimalType
+	if (timer_time == 0)
+		LZ4Timer.sendCommand(60)
+end
+
+//If for any reason a light enters Pending_Off status
+//we should reset the timer to the Pending_Off time value
+rule "LZ4ResetTimeWhenPendingOff"
+when
+	Item LZ4Sts received update "Pending_Off"
+then
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	LZ4Timer.sendCommand(pending_time)
+end
+
+//If for any reason a light enters Off status
+//we should reset the timer to zero
+rule "LZ4ZeroTimerWhenOff"
+when
+	Item LZ4Sts received update "Off"
+then
+	LZ4Timer.sendCommand(0)
+end
+
+//Each time the an ON command is published we
+//should increment the amount of time remaining
+rule "LZ5IncrementTime"
+when
+	Item LZ5Cmd_in received update "ON"
+then
+	var Number new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
+	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	
+	new_time = new_time + 60
+	if (new_time > max_time) new_time = max_time
+	LZ5Timer.sendCommand(new_time)
+end
+
+//When the timer gets all the way to the Pending_Off time value
+//we should send the OFF command to the Master COntrol Panel
+//so that it actually enters Pending_Off status
+rule "LZ5TimerAutoOff"
+when
+	Item LZ5Timer received command
+then
+	var Number new_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	
+	if (new_time <= pending_time)
+	{
+		if (LZ5Sts.state == "On")
+		{
+			LZ5Cmd.sendCommand(OFF)
+		}	
+	}
+end
+
+//The Master Control Panel buttons don't publish MQTT commands
+//So we need to detect the status and some time if there
+//isn't already some time setup
+rule "LZ5SetTimerWhenOn"
+when
+	Item LZ5Sts received update "On"
+then
+	var Number timer_time = LZ5Timer.state as org.openhab.core.library.types.DecimalType
+	if (timer_time == 0)
+		LZ5Timer.sendCommand(60)
+end
+
+//If for any reason a light enters Pending_Off status
+//we should reset the timer to the Pending_Off time value
+rule "LZ5ResetTimeWhenPendingOff"
+when
+	Item LZ5Sts received update "Pending_Off"
+then
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	LZ5Timer.sendCommand(pending_time)
+end
+
+//If for any reason a light enters Off status
+//we should reset the timer to zero
+rule "LZ5ZeroTimerWhenOff"
+when
+	Item LZ5Sts received update "Off"
+then
+	LZ5Timer.sendCommand(0)
+end
+
+//Each time the an ON command is published we
+//should increment the amount of time remaining
+rule "LZ6IncrementTime"
+when
+	Item LZ6Cmd_in received update "ON"
+then
+	var Number new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
+	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	
+	new_time = new_time + 60
+	if (new_time > max_time) new_time = max_time
+	LZ6Timer.sendCommand(new_time)
+end
+
+//When the timer gets all the way to the Pending_Off time value
+//we should send the OFF command to the Master COntrol Panel
+//so that it actually enters Pending_Off status
+rule "LZ6TimerAutoOff"
+when
+	Item LZ6Timer received command
+then
+	var Number new_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	
+	if (new_time <= pending_time)
+	{
+		if (LZ6Sts.state == "On")
+		{
+			LZ6Cmd.sendCommand(OFF)
+		}	
+	}
+end
+
+//The Master Control Panel buttons don't publish MQTT commands
+//So we need to detect the status and some time if there
+//isn't already some time setup
+rule "LZ6SetTimerWhenOn"
+when
+	Item LZ6Sts received update "On"
+then
+	var Number timer_time = LZ6Timer.state as org.openhab.core.library.types.DecimalType
+	if (timer_time == 0)
+		LZ6Timer.sendCommand(60)
+end
+
+//If for any reason a light enters Pending_Off status
+//we should reset the timer to the Pending_Off time value
+rule "LZ6ResetTimeWhenPendingOff"
+when
+	Item LZ6Sts received update "Pending_Off"
+then
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	LZ6Timer.sendCommand(pending_time)
+end
+
+//If for any reason a light enters Off status
+//we should reset the timer to zero
+rule "LZ6ZeroTimerWhenOff"
+when
+	Item LZ6Sts received update "Off"
+then
+	LZ6Timer.sendCommand(0)
+end
+
+//Each time the an ON command is published we
+//should increment the amount of time remaining
+rule "LZ7IncrementTime"
+when
+	Item LZ7Cmd_in received update "ON"
+then
+	var Number new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
+	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	
+	new_time = new_time + 60
+	if (new_time > max_time) new_time = max_time
+	LZ7Timer.sendCommand(new_time)
+end
+
+//When the timer gets all the way to the Pending_Off time value
+//we should send the OFF command to the Master COntrol Panel
+//so that it actually enters Pending_Off status
+rule "LZ7TimerAutoOff"
+when
+	Item LZ7Timer received command
+then
+	var Number new_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	
+	if (new_time <= pending_time)
+	{
+		if (LZ7Sts.state == "On")
+		{
+			LZ7Cmd.sendCommand(OFF)
+		}	
+	}
+end
+
+//The Master Control Panel buttons don't publish MQTT commands
+//So we need to detect the status and some time if there
+//isn't already some time setup
+rule "LZ7SetTimerWhenOn"
+when
+	Item LZ7Sts received update "On"
+then
+	var Number timer_time = LZ7Timer.state as org.openhab.core.library.types.DecimalType
+	if (timer_time == 0)
+		LZ7Timer.sendCommand(60)
+end
+
+//If for any reason a light enters Pending_Off status
+//we should reset the timer to the Pending_Off time value
+rule "LZ7ResetTimeWhenPendingOff"
+when
+	Item LZ7Sts received update "Pending_Off"
+then
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	LZ7Timer.sendCommand(pending_time)
+end
+
+//If for any reason a light enters Off status
+//we should reset the timer to zero
+rule "LZ7ZeroTimerWhenOff"
+when
+	Item LZ7Sts received update "Off"
+then
+	LZ7Timer.sendCommand(0)
+end
+
+//Each time the an ON command is published we
+//should increment the amount of time remaining
+rule "LZ8IncrementTime"
+when
+	Item LZ8Cmd_in received update "ON"
+then
+	var Number new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
+	var Number max_time = LZ_Max_Time.state as org.openhab.core.library.types.DecimalType
+	
+	new_time = new_time + 60
+	if (new_time > max_time) new_time = max_time
+	LZ8Timer.sendCommand(new_time)
+end
+
+//When the timer gets all the way to the Pending_Off time value
+//we should send the OFF command to the Master COntrol Panel
+//so that it actually enters Pending_Off status
+rule "LZ8TimerAutoOff"
+when
+	Item LZ8Timer received command
+then
+	var Number new_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	
+	if (new_time <= pending_time)
+	{
+		if (LZ8Sts.state == "On")
+		{
+			LZ8Cmd.sendCommand(OFF)
+		}	
+	}
+end
+
+//The Master Control Panel buttons don't publish MQTT commands
+//So we need to detect the status and some time if there
+//isn't already some time setup
+rule "LZ8SetTimerWhenOn"
+when
+	Item LZ8Sts received update "On"
+then
+	var Number timer_time = LZ8Timer.state as org.openhab.core.library.types.DecimalType
+	if (timer_time == 0)
+		LZ8Timer.sendCommand(60)
+end
+
+//If for any reason a light enters Pending_Off status
+//we should reset the timer to the Pending_Off time value
+rule "LZ8ResetTimeWhenPendingOff"
+when
+	Item LZ8Sts received update "Pending_Off"
+then
+	var Number pending_time = LZ_Pending_Off_Time.state as org.openhab.core.library.types.DecimalType
+	LZ8Timer.sendCommand(pending_time)
+end
+
+//If for any reason a light enters Off status
+//we should reset the timer to zero
+rule "LZ8ZeroTimerWhenOff"
+when
+	Item LZ8Sts received update "Off"
+then
+	LZ8Timer.sendCommand(0)
+end
+
+	

@@ -1,0 +1,27 @@
+sitemap name label="MMS" {
+	Frame {
+		Text item=LZ1Sts label="Light Zone 1 Status [%s]"
+		Setpoint item=LZ1Timer minValue=0 maxValue=480 step=60
+		
+		Text item=LZ2Sts label="Light Zone 2 Status [%s]"
+		Setpoint item=LZ2Timer minValue=0 maxValue=480 step=60
+		
+		Text item=LZ3Sts label="Light Zone 3 Status [%s]"
+		Setpoint item=LZ3Timer minValue=0 maxValue=480 step=60
+		
+		Text item=LZ4Sts label="Light Zone 4 Status [%s]"
+		Setpoint item=LZ4Timer minValue=0 maxValue=480 step=60
+		
+		Text item=LZ5Sts label="Light Zone 5 Status [%s]"
+		Setpoint item=LZ5Timer minValue=0 maxValue=480 step=60
+		
+		Text item=LZ6Sts label="Light Zone 6 Status [%s]"
+		Setpoint item=LZ6Timer minValue=0 maxValue=480 step=60
+		
+		Text item=LZ7Sts label="Light Zone 7 Status [%s]"
+		Setpoint item=LZ7Timer minValue=0 maxValue=480 step=60
+		
+		Text item=LZ8Sts label="Light Zone 8 Status [%s]"
+		Setpoint item=LZ8Timer minValue=0 maxValue=480 step=60
+	}
+}
