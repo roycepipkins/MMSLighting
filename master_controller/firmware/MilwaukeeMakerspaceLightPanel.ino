@@ -140,11 +140,15 @@ void setup() {
     mcp_io.inputInvert(i, 1);
     
   }
+
+  Serial.println("Starting");
 }
 
 bool IsMQTTConnected()
 {
   static Timestamp last_ping;
+  static Timestamp last_mqtt_attempt;
+  static bool initial_mqtt = true;
   
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -167,11 +171,19 @@ bool IsMQTTConnected()
     {
       digitalWrite(Mqtt_LED, LOW);
       mqtt.disconnect();
-      if (mqtt.connect() == 0) 
+      if (last_mqtt_attempt.Elapsed() > 60000 || initial_mqtt)
       {
-        Serial.println("MQTT Connected.");
-        digitalWrite(Mqtt_LED, HIGH);
-        return true;
+        initial_mqtt = false;
+        Serial.println("Trying to connect to MQTT Broker...");
+        if (mqtt.connect() == 0) 
+        {
+          Serial.println("MQTT Connected.");
+          digitalWrite(Mqtt_LED, HIGH);
+          return true;
+        }
+        else
+          Serial.println("MQTT connection failed");
+        last_mqtt_attempt.Update();
       }
     }
   }
@@ -231,7 +243,8 @@ void loop()
   {
     if (lz[i]->Update())
     {
-        Zone_Status_Pubs[i]->publish(lz[i]->GetStatusText());
+        Serial.println("Update");
+        if (IsMQTTConnected()) Zone_Status_Pubs[i]->publish(lz[i]->GetStatusText());
         PrintState(i, lz[i]->GetStatusText());
     }
   }

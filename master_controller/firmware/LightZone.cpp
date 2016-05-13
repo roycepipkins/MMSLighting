@@ -69,6 +69,7 @@ bool LightZone::ProcessButton()
   
 	if (button_input && !button_pre_status && !button_status)
 	{
+    
 	  button_pressed.Update();
 	  button_pre_status = true;
 	}
