@@ -9,7 +9,7 @@
 
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
-#define AT_HOME
+#define AT_MAKERSPACE
 #include "Credentials.h"
 
 const int Wifi_LED = 5;
