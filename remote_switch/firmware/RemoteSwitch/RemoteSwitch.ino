@@ -60,6 +60,7 @@ const int NeoPixel_Pin = 13;
 
 const int Debounce_time = 75;
 const int Blink_time = 250;
+const int Long_Press_Time = 5000;
 
 const int Max_Hue_Time = 180; //amount of time remaining for light to be green
 
@@ -266,7 +267,7 @@ void SetNeoPixelToTimeLeft(int time_left)
   pixel.show();
 }
 
-bool ButtonPressed()
+bool ButtonPressed(uint32_t& time_pressed)
 {
   static bool last_button = false;
   static bool reported = false;
@@ -281,10 +282,11 @@ bool ButtonPressed()
       press_time.Update();
       last_button = true;
     }
-    else if (last_button && button)
+    else if (last_button && !button)
     {
       if (press_time.Elapsed() >= Debounce_time)
       {
+        time_pressed = press_time.Elapsed();
         reported = true;
         return true;   
       }
@@ -362,9 +364,13 @@ void loop() {
       }
     }
 
-    if (ButtonPressed())
+    uint32_t time_pressed = 0;
+    if (ButtonPressed(time_pressed))
     {
-      LZ_Cmd.publish("ON");
+      if (time_pressed >= Long_Press_Time)
+        LZ_Cmd.publish("OFF");
+      else
+        LZ_Cmd.publish("ON");
     }
   }
 
