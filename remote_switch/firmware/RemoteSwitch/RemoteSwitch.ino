@@ -113,7 +113,8 @@ void setup() {
 
   pixel.begin();
   pixel.show();
-  
+
+  SetNeoPixelToTimeLeft(0);
 }
 
 double floatmod(double a, double b)
@@ -333,7 +334,10 @@ void loop() {
       {
         time_left = atoi((const char*)subscription->lastread);
 
-        if (last_status && time_left > 0)
+         Serial.print("time_left: ");
+         Serial.println(time_left);
+        
+        if (time_left > 0)
         {
           SetNeoPixelToTimeLeft(time_left);
         }
