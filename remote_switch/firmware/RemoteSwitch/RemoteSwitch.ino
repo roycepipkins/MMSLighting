@@ -6,10 +6,10 @@
 #include <math.h>
 #include <Adafruit_NeoPixel.h>
 
-#define AT_HOME
+#define AT_MAKERSPACE
 #include "Credentials.h"
 
-#define LIGHT_ZONE 1
+#define LIGHT_ZONE 2
 
 const char Mqtt_Server[] PROGMEM    = MQTT_SERVER;
 const char Mqtt_Username[] PROGMEM  = MQTT_USERNAME;
@@ -53,10 +53,10 @@ const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ8_Cmd";
 
 
 
-const int LightSwitch_Pin = 0;
-const int Wifi_LED = 12;
-const int Mqtt_LED = 13; 
-const int NeoPixel_Pin = 5;
+const int LightSwitch_Pin = 12;
+const int Wifi_LED = 16;
+const int Mqtt_LED = 14; 
+const int NeoPixel_Pin = 13;
 
 const int Debounce_time = 75;
 const int Blink_time = 250;
