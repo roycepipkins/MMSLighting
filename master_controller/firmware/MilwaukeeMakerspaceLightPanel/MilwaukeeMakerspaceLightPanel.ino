@@ -1,5 +1,8 @@
 #include <Arduino.h>
-
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
 #include <inttypes.h>
 #include <ESP8266WiFi.h>
 #include <MCP23S17.h>
@@ -9,11 +12,13 @@
 
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
-#define AT_MAKERSPACE
+#define LIVE_MAKERSPACE
 #include "Credentials.h"
 
 const int Wifi_LED = 5;
 const int Mqtt_LED = 4;
+
+const char ota_hostname[] PROGMEM = "LightMaster";
 
 // Store the MQTT server, username, and password in flash memory.
 // This is required for using the Adafruit MQTT library.
@@ -141,6 +146,27 @@ void setup() {
     
   }
 
+  ArduinoOTA.onStart([]() {
+    Serial.println("OTA Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nOTA End");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("OTA Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("OTA Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("OTA Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("OTA Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("OTA Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("OTA Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("OTA End Failed");
+  });
+  
+  ArduinoOTA.setHostname(ota_hostname);
+
+
   Serial.println("Starting");
 }
 
@@ -207,6 +233,25 @@ void PrintState(const int i, const char* state)
 
 void loop()
 {
+
+  static bool initial_wifi = true;
+
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    if (initial_wifi)
+    {
+      ArduinoOTA.begin();
+      Serial.println("OTA Begin");
+      Serial.print("My IP address: ");
+      Serial.println(WiFi.localIP());
+      initial_wifi = false;
+    }
+    else
+    {
+      ArduinoOTA.handle();
+    }
+  }
+  
   if (IsMQTTConnected())
   {
     Adafruit_MQTT_Subscribe *subscription = 0;

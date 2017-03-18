@@ -1,5 +1,8 @@
 #include <inttypes.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 #include "Timestamp.h"
@@ -9,7 +12,8 @@
 #define AT_MAKERSPACE
 #include "Credentials.h"
 
-#define LIGHT_ZONE 2
+#define LIGHT_ZONE 5
+const char ota_hostname[] PROGMEM = "LZ7SW1";
 
 const char Mqtt_Server[] PROGMEM    = MQTT_SERVER;
 const char Mqtt_Username[] PROGMEM  = MQTT_USERNAME;
@@ -61,6 +65,7 @@ const int NeoPixel_Pin = 13;
 const int Debounce_time = 75;
 const int Blink_time = 250;
 const int Long_Press_Time = 5000;
+const bool Long_Press_Enabled = true;
 
 const int Max_Hue_Time = 180; //amount of time remaining for light to be green
 
@@ -115,6 +120,26 @@ void setup() {
   pixel.show();
 
   SetNeoPixelToTimeLeft(0);
+
+  ArduinoOTA.onStart([]() {
+    Serial.println("OTA Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nOTA End");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("OTA Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("OTA Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("OTA Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("OTA Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("OTA Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("OTA Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("OTA End Failed");
+  });
+  
+  ArduinoOTA.setHostname(ota_hostname);
 }
 
 double floatmod(double a, double b)
@@ -198,10 +223,13 @@ bool IsMQTTConnected()
   static Timestamp last_ping;
   static Timestamp last_mqtt_attempt;
   static bool initial_mqtt = true;
+  static bool initial_wifi = true;
+  bool ret = false;
   
   if (WiFi.status() == WL_CONNECTED)
   {
     digitalWrite(Wifi_LED, HIGH);
+
     if (mqtt.connected()) 
     {
       digitalWrite(Mqtt_LED, HIGH);
@@ -214,7 +242,7 @@ bool IsMQTTConnected()
           digitalWrite(Mqtt_LED, LOW);
         }
       }
-      return true;
+      ret = true;
     }
     else
     {
@@ -227,14 +255,19 @@ bool IsMQTTConnected()
         if (mqtt.connect() == 0) 
         {
           Serial.println("MQTT Connected.");
+          
           digitalWrite(Mqtt_LED, HIGH);
-          return true;
+          ret = true;
         }
         else
           Serial.println("MQTT connection failed");
         last_mqtt_attempt.Update();
       }
     }
+
+
+    
+    
   }
   else
   {
@@ -243,7 +276,7 @@ bool IsMQTTConnected()
     mqtt.disconnect();
   }
 
-  return false;
+  return ret;
 }
 
 
@@ -322,6 +355,24 @@ void loop() {
   static bool last_status = false;
   static int time_left = 0;
   static bool pending_off = false;
+  static bool initial_wifi = true;
+
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    if (initial_wifi)
+    {
+      ArduinoOTA.begin();
+      Serial.println("OTA Begin");
+      Serial.print("My IP address: ");
+      Serial.println(WiFi.localIP());
+      initial_wifi = false;
+    }
+    else
+    {
+      ArduinoOTA.handle();
+    }
+  }
+
   
   
   if (IsMQTTConnected())
@@ -371,7 +422,7 @@ void loop() {
     uint32_t time_pressed = 0;
     if (ButtonPressed(time_pressed))
     {
-      if (time_pressed >= Long_Press_Time)
+      if (time_pressed >= Long_Press_Time && Long_Press_Enabled)
         LZ_Cmd.publish("OFF");
       else
         LZ_Cmd.publish("ON");
@@ -379,4 +430,6 @@ void loop() {
   }
 
   if (pending_off) RunPendingOff();
+
+  
 }

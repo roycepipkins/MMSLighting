@@ -52,7 +52,7 @@ private:
 
 
   static const uint32_t debounce = 100;
-  static const uint32_t pending_time = 20000;
+  static const uint32_t pending_time = 300000;
 
   bool UpdateStatus();
   bool ProcessButton();
