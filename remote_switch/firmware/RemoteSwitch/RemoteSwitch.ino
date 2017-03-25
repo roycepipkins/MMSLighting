@@ -12,8 +12,8 @@
 #define AT_MAKERSPACE
 #include "Credentials.h"
 
-#define LIGHT_ZONE 5
-const char ota_hostname[] PROGMEM = "LZ7SW1";
+#define LIGHT_ZONE 6
+const char ota_hostname[] PROGMEM = "LZ6SW2";
 
 const char Mqtt_Server[] PROGMEM    = MQTT_SERVER;
 const char Mqtt_Username[] PROGMEM  = MQTT_USERNAME;
@@ -77,9 +77,9 @@ const double Lightness = 0.5;
 WiFiClient client;
 
 Adafruit_MQTT_Client mqtt(&client, Mqtt_Server, MQTT_SERVERPORT, Mqtt_Username, Mqtt_Password);
-Adafruit_MQTT_Publish LZ_Cmd = Adafruit_MQTT_Publish(&mqtt, LZ_Cmd_Topic);
-Adafruit_MQTT_Subscribe LZ_Sts = Adafruit_MQTT_Subscribe(&mqtt, LZ_Sts_Topic);
-Adafruit_MQTT_Subscribe LZ_Tmr = Adafruit_MQTT_Subscribe(&mqtt, LZ_Timer_Topic);
+Adafruit_MQTT_Publish LZ_Cmd = Adafruit_MQTT_Publish(&mqtt, LZ_Cmd_Topic, 1);
+Adafruit_MQTT_Subscribe LZ_Sts = Adafruit_MQTT_Subscribe(&mqtt, LZ_Sts_Topic, 1);
+Adafruit_MQTT_Subscribe LZ_Tmr = Adafruit_MQTT_Subscribe(&mqtt, LZ_Timer_Topic, 1);
 
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(1, NeoPixel_Pin, NEO_RGB + NEO_KHZ800);
 
@@ -140,6 +140,7 @@ void setup() {
   });
   
   ArduinoOTA.setHostname(ota_hostname);
+  ArduinoOTA.setPassword(OTA_PASSWORD);
 }
 
 double floatmod(double a, double b)
@@ -423,9 +424,9 @@ void loop() {
     if (ButtonPressed(time_pressed))
     {
       if (time_pressed >= Long_Press_Time && Long_Press_Enabled)
-        LZ_Cmd.publish("OFF");
+        LZ_Cmd.publish("Off");
       else
-        LZ_Cmd.publish("ON");
+        LZ_Cmd.publish("On");
     }
   }
 

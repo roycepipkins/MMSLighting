@@ -51,25 +51,25 @@ const char LZ8_Sts_Topic[] PROGMEM = "Lighting/LZ8_Sts";
 WiFiClient client;
 Adafruit_MQTT_Client mqtt(&client, Mqtt_Server, MQTT_SERVERPORT, Mqtt_Username, Mqtt_Password);
 
-Adafruit_MQTT_Publish LZ1_Sts = Adafruit_MQTT_Publish(&mqtt, LZ1_Sts_Topic);
-Adafruit_MQTT_Publish LZ2_Sts = Adafruit_MQTT_Publish(&mqtt, LZ2_Sts_Topic);
-Adafruit_MQTT_Publish LZ3_Sts = Adafruit_MQTT_Publish(&mqtt, LZ3_Sts_Topic);
-Adafruit_MQTT_Publish LZ4_Sts = Adafruit_MQTT_Publish(&mqtt, LZ4_Sts_Topic);
-Adafruit_MQTT_Publish LZ5_Sts = Adafruit_MQTT_Publish(&mqtt, LZ5_Sts_Topic);
-Adafruit_MQTT_Publish LZ6_Sts = Adafruit_MQTT_Publish(&mqtt, LZ6_Sts_Topic);
-Adafruit_MQTT_Publish LZ7_Sts = Adafruit_MQTT_Publish(&mqtt, LZ7_Sts_Topic);
-Adafruit_MQTT_Publish LZ8_Sts = Adafruit_MQTT_Publish(&mqtt, LZ8_Sts_Topic);
+Adafruit_MQTT_Publish LZ1_Sts = Adafruit_MQTT_Publish(&mqtt, LZ1_Sts_Topic, 1);
+Adafruit_MQTT_Publish LZ2_Sts = Adafruit_MQTT_Publish(&mqtt, LZ2_Sts_Topic, 1);
+Adafruit_MQTT_Publish LZ3_Sts = Adafruit_MQTT_Publish(&mqtt, LZ3_Sts_Topic, 1);
+Adafruit_MQTT_Publish LZ4_Sts = Adafruit_MQTT_Publish(&mqtt, LZ4_Sts_Topic, 1);
+Adafruit_MQTT_Publish LZ5_Sts = Adafruit_MQTT_Publish(&mqtt, LZ5_Sts_Topic, 1);
+Adafruit_MQTT_Publish LZ6_Sts = Adafruit_MQTT_Publish(&mqtt, LZ6_Sts_Topic, 1);
+Adafruit_MQTT_Publish LZ7_Sts = Adafruit_MQTT_Publish(&mqtt, LZ7_Sts_Topic, 1);
+Adafruit_MQTT_Publish LZ8_Sts = Adafruit_MQTT_Publish(&mqtt, LZ8_Sts_Topic, 1);
 
 Adafruit_MQTT_Publish* Zone_Status_Pubs[] = {&LZ1_Sts, &LZ2_Sts, &LZ3_Sts, &LZ4_Sts, &LZ5_Sts, &LZ6_Sts, &LZ7_Sts, &LZ8_Sts};
 
-Adafruit_MQTT_Subscribe LZ1_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ1_Cmd_Topic);
-Adafruit_MQTT_Subscribe LZ2_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ2_Cmd_Topic);
-Adafruit_MQTT_Subscribe LZ3_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ3_Cmd_Topic);
-Adafruit_MQTT_Subscribe LZ4_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ4_Cmd_Topic);
-Adafruit_MQTT_Subscribe LZ5_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ5_Cmd_Topic);
-Adafruit_MQTT_Subscribe LZ6_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ6_Cmd_Topic);
-Adafruit_MQTT_Subscribe LZ7_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ7_Cmd_Topic);
-Adafruit_MQTT_Subscribe LZ8_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ8_Cmd_Topic);
+Adafruit_MQTT_Subscribe LZ1_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ1_Cmd_Topic, 1);
+Adafruit_MQTT_Subscribe LZ2_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ2_Cmd_Topic, 1);
+Adafruit_MQTT_Subscribe LZ3_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ3_Cmd_Topic, 1);
+Adafruit_MQTT_Subscribe LZ4_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ4_Cmd_Topic, 1);
+Adafruit_MQTT_Subscribe LZ5_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ5_Cmd_Topic, 1);
+Adafruit_MQTT_Subscribe LZ6_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ6_Cmd_Topic, 1);
+Adafruit_MQTT_Subscribe LZ7_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ7_Cmd_Topic, 1);
+Adafruit_MQTT_Subscribe LZ8_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ8_Cmd_Topic, 1);
 
 Adafruit_MQTT_Subscribe* Zone_Cmd_Subs[] = {&LZ1_Cmd, &LZ2_Cmd, &LZ3_Cmd, &LZ4_Cmd, &LZ5_Cmd, &LZ6_Cmd, &LZ7_Cmd, &LZ8_Cmd};
 
@@ -165,7 +165,7 @@ void setup() {
   });
   
   ArduinoOTA.setHostname(ota_hostname);
-
+  ArduinoOTA.setPassword(OTA_PASSWORD);
 
   Serial.println("Starting");
 }
@@ -262,6 +262,10 @@ void loop()
       {
         if (subscription == Zone_Cmd_Subs[i])
         {
+          Serial.print("MQTT: Zone ");
+          Serial.print(i);
+          Serial.print(" ");
+          Serial.println((char*)(subscription->lastread));
           if (strncasecmp("On", (char*)(subscription->lastread), 2) == 0)
           {
             if (lz[i]->TurnOn())
