@@ -18,34 +18,34 @@
 const int Wifi_LED = 5;
 const int Mqtt_LED = 4;
 
-const char ota_hostname[] PROGMEM = "LightMaster";
+const char ota_hostname[]  = "LightMaster";
 
 // Store the MQTT server, username, and password in flash memory.
 // This is required for using the Adafruit MQTT library.
-const char Mqtt_Server[] PROGMEM    = MQTT_SERVER;
-const char Mqtt_Username[] PROGMEM  = MQTT_USERNAME;
-const char Mqtt_Password[] PROGMEM  = MQTT_KEY;
+const char Mqtt_Server[]     = MQTT_SERVER;
+const char Mqtt_Username[]   = MQTT_USERNAME;
+const char Mqtt_Password[]   = MQTT_KEY;
 
 //Cmd will ON/OFF
 //Sts will be ON, OVERRIDDEN, PENDING_OFF, OFF
 
-const char LZ1_Cmd_Topic[] PROGMEM = "Lighting/LZ1_Cmd";
-const char LZ2_Cmd_Topic[] PROGMEM = "Lighting/LZ2_Cmd";
-const char LZ3_Cmd_Topic[] PROGMEM = "Lighting/LZ3_Cmd";
-const char LZ4_Cmd_Topic[] PROGMEM = "Lighting/LZ4_Cmd";
-const char LZ5_Cmd_Topic[] PROGMEM = "Lighting/LZ5_Cmd";
-const char LZ6_Cmd_Topic[] PROGMEM = "Lighting/LZ6_Cmd";
-const char LZ7_Cmd_Topic[] PROGMEM = "Lighting/LZ7_Cmd";
-const char LZ8_Cmd_Topic[] PROGMEM = "Lighting/LZ8_Cmd";
+const char LZ1_Cmd_Topic[]  = "Lighting/LZ1_Cmd";
+const char LZ2_Cmd_Topic[]  = "Lighting/LZ2_Cmd";
+const char LZ3_Cmd_Topic[]  = "Lighting/LZ3_Cmd";
+const char LZ4_Cmd_Topic[]  = "Lighting/LZ4_Cmd";
+const char LZ5_Cmd_Topic[]  = "Lighting/LZ5_Cmd";
+const char LZ6_Cmd_Topic[]  = "Lighting/LZ6_Cmd";
+const char LZ7_Cmd_Topic[]  = "Lighting/LZ7_Cmd";
+const char LZ8_Cmd_Topic[]  = "Lighting/LZ8_Cmd";
 
-const char LZ1_Sts_Topic[] PROGMEM = "Lighting/LZ1_Sts";
-const char LZ2_Sts_Topic[] PROGMEM = "Lighting/LZ2_Sts";
-const char LZ3_Sts_Topic[] PROGMEM = "Lighting/LZ3_Sts";
-const char LZ4_Sts_Topic[] PROGMEM = "Lighting/LZ4_Sts";
-const char LZ5_Sts_Topic[] PROGMEM = "Lighting/LZ5_Sts";
-const char LZ6_Sts_Topic[] PROGMEM = "Lighting/LZ6_Sts";
-const char LZ7_Sts_Topic[] PROGMEM = "Lighting/LZ7_Sts";
-const char LZ8_Sts_Topic[] PROGMEM = "Lighting/LZ8_Sts";
+const char LZ1_Sts_Topic[]  = "Lighting/LZ1_Sts";
+const char LZ2_Sts_Topic[]  = "Lighting/LZ2_Sts";
+const char LZ3_Sts_Topic[]  = "Lighting/LZ3_Sts";
+const char LZ4_Sts_Topic[]  = "Lighting/LZ4_Sts";
+const char LZ5_Sts_Topic[]  = "Lighting/LZ5_Sts";
+const char LZ6_Sts_Topic[]  = "Lighting/LZ6_Sts";
+const char LZ7_Sts_Topic[]  = "Lighting/LZ7_Sts";
+const char LZ8_Sts_Topic[]  = "Lighting/LZ8_Sts";
 
 
 WiFiClient client;
@@ -88,7 +88,7 @@ LightZone lz8(mcp_io, 7, 15, 31, 23);
 
 LightZone* lz[8] = {&lz1, &lz2, &lz3, &lz4, &lz5, &lz6, &lz7, &lz8};
 
-int strncasecmp(const char* s1, const char* s2, int len)
+int mystrncasecmp(const char* s1, const char* s2, int len)
 {
   int i;
   for(i = 0; i < len && s1[i] && s2[i]; ++i)
@@ -266,7 +266,7 @@ void loop()
           Serial.print(i);
           Serial.print(" ");
           Serial.println((char*)(subscription->lastread));
-          if (strncasecmp("On", (char*)(subscription->lastread), 2) == 0)
+          if (mystrncasecmp("On", (char*)(subscription->lastread), 2) == 0)
           {
             if (lz[i]->TurnOn())
             {
@@ -274,7 +274,7 @@ void loop()
               //PrintState(i, lz[i]->GetStatusText());
             }
           }
-          if (strncasecmp("Off", (char*)(subscription->lastread), 3) == 0)
+          if (mystrncasecmp("Off", (char*)(subscription->lastread), 3) == 0)
           {
             if (lz[i]->StartPendingOff())
             {
