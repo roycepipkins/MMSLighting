@@ -12,47 +12,47 @@
 #define AT_MAKERSPACE
 #include "Credentials.h"
 
-#define LIGHT_ZONE 6
-const char ota_hostname[] PROGMEM = "LZ6SW2";
+#define LIGHT_ZONE 7
+const char ota_hostname[]  = "LZ7SW1";
 
-const char Mqtt_Server[] PROGMEM    = MQTT_SERVER;
-const char Mqtt_Username[] PROGMEM  = MQTT_USERNAME;
-const char Mqtt_Password[] PROGMEM  = MQTT_KEY;
+const char Mqtt_Server[]     = MQTT_SERVER;
+const char Mqtt_Username[]  = MQTT_USERNAME;
+const char Mqtt_Password[]   = MQTT_KEY;
 
 
 
 #if LIGHT_ZONE == 1
-const char LZ_Timer_Topic[] PROGMEM = "Lighting/LZ1_Timer";
-const char LZ_Sts_Topic[] PROGMEM = "Lighting/LZ1_Sts";
-const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ1_Cmd";
+const char LZ_Timer_Topic[]  = "Lighting/LZ1_Timer";
+const char LZ_Sts_Topic[]  = "Lighting/LZ1_Sts";
+const char LZ_Cmd_Topic[]  = "Lighting/LZ1_Cmd";
 #elif LIGHT_ZONE == 2
-const char LZ_Timer_Topic[] PROGMEM = "Lighting/LZ2_Timer";
-const char LZ_Sts_Topic[] PROGMEM = "Lighting/LZ2_Sts";
-const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ2_Cmd";
+const char LZ_Timer_Topic[]  = "Lighting/LZ2_Timer";
+const char LZ_Sts_Topic[]  = "Lighting/LZ2_Sts";
+const char LZ_Cmd_Topic[]  = "Lighting/LZ2_Cmd";
 #elif LIGHT_ZONE == 3
-const char LZ_Timer_Topic[] PROGMEM = "Lighting/LZ3_Timer";
-const char LZ_Sts_Topic[] PROGMEM = "Lighting/LZ3_Sts";
-const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ3_Cmd";
+const char LZ_Timer_Topic[]  = "Lighting/LZ3_Timer";
+const char LZ_Sts_Topic[]  = "Lighting/LZ3_Sts";
+const char LZ_Cmd_Topic[]  = "Lighting/LZ3_Cmd";
 #elif LIGHT_ZONE == 4
-const char LZ_Timer_Topic[] PROGMEM = "Lighting/LZ4_Timer";
-const char LZ_Sts_Topic[] PROGMEM = "Lighting/LZ4_Sts";
-const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ4_Cmd";
+const char LZ_Timer_Topic[]  = "Lighting/LZ4_Timer";
+const char LZ_Sts_Topic[]  = "Lighting/LZ4_Sts";
+const char LZ_Cmd_Topic[]  = "Lighting/LZ4_Cmd";
 #elif LIGHT_ZONE == 5
-const char LZ_Timer_Topic[] PROGMEM = "Lighting/LZ5_Timer";
-const char LZ_Sts_Topic[] PROGMEM = "Lighting/LZ5_Sts";
-const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ5_Cmd";
+const char LZ_Timer_Topic[]  = "Lighting/LZ5_Timer";
+const char LZ_Sts_Topic[]  = "Lighting/LZ5_Sts";
+const char LZ_Cmd_Topic[]  = "Lighting/LZ5_Cmd";
 #elif LIGHT_ZONE == 6
-const char LZ_Timer_Topic[] PROGMEM = "Lighting/LZ6_Timer";
-const char LZ_Sts_Topic[] PROGMEM = "Lighting/LZ6_Sts";
-const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ6_Cmd";
+const char LZ_Timer_Topic[]  = "Lighting/LZ6_Timer";
+const char LZ_Sts_Topic[]  = "Lighting/LZ6_Sts";
+const char LZ_Cmd_Topic[]  = "Lighting/LZ6_Cmd";
 #elif LIGHT_ZONE == 7
-const char LZ_Timer_Topic[] PROGMEM = "Lighting/LZ7_Timer";
-const char LZ_Sts_Topic[] PROGMEM = "Lighting/LZ7_Sts";
-const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ7_Cmd";
+const char LZ_Timer_Topic[]  = "Lighting/LZ7_Timer";
+const char LZ_Sts_Topic[]  = "Lighting/LZ7_Sts";
+const char LZ_Cmd_Topic[]  = "Lighting/LZ7_Cmd";
 #elif LIGHT_ZONE == 8
-const char LZ_Timer_Topic[] PROGMEM = "Lighting/LZ8_Timer";
-const char LZ_Sts_Topic[] PROGMEM = "Lighting/LZ8_Sts";
-const char LZ_Cmd_Topic[] PROGMEM = "Lighting/LZ8_Cmd";
+const char LZ_Timer_Topic[]  = "Lighting/LZ8_Timer";
+const char LZ_Sts_Topic[]  = "Lighting/LZ8_Sts";
+const char LZ_Cmd_Topic[]  = "Lighting/LZ8_Cmd";
 #endif
 
 
@@ -140,7 +140,9 @@ void setup() {
   });
   
   ArduinoOTA.setHostname(ota_hostname);
+#ifdef OTA_PASSWORD
   ArduinoOTA.setPassword(OTA_PASSWORD);
+#endif 
 }
 
 double floatmod(double a, double b)
@@ -205,7 +207,7 @@ void HSL2RGB(double h, double s, double l, uint8_t rgb[])
 
 }
 
-int strncasecmp(const char* s1, const char* s2, int len)
+int mystrncasecmp(const char* s1, const char* s2, int len)
 {
   int i;
   for(i = 0; i < len && s1[i] && s2[i]; ++i)
@@ -400,20 +402,20 @@ void loop() {
         //TODO make sure NeoPixel's state is consistant
         //e.g. if NeoPixel is off turn is on to some color
 
-        if (strncasecmp((const char*)subscription->lastread, "OFF", 3) == 0)
+        if (mystrncasecmp((const char*)subscription->lastread, "OFF", 3) == 0)
         {
           pending_off = false;
           SetNeoPixelToTimeLeft(0);
         }
 
-        if (strncasecmp((const char*)subscription->lastread, "ON", 2) == 0)
+        if (mystrncasecmp((const char*)subscription->lastread, "ON", 2) == 0)
         {
           last_status = true;
           pending_off = false;
           SetNeoPixelToTimeLeft(time_left);
         }
 
-        if (strncasecmp((const char*)subscription->lastread, "Pending_Off", 11) == 0)
+        if (mystrncasecmp((const char*)subscription->lastread, "Pending_Off", 11) == 0)
         {
           pending_off = true;
         }

@@ -165,7 +165,9 @@ void setup() {
   });
   
   ArduinoOTA.setHostname(ota_hostname);
+#ifdef OTA_PASSWORD
   ArduinoOTA.setPassword(OTA_PASSWORD);
+#endif
 
   Serial.println("Starting");
 }
@@ -182,7 +184,7 @@ bool IsMQTTConnected()
     if (mqtt.connected()) 
     {
       digitalWrite(Mqtt_LED, HIGH);
-      if (last_ping.Elapsed() >= 30000)
+      if (last_ping.Elapsed() >= 10000)
       {
         last_ping.Update();
         if(!mqtt.ping())
@@ -197,7 +199,7 @@ bool IsMQTTConnected()
     {
       digitalWrite(Mqtt_LED, LOW);
       mqtt.disconnect();
-      if (last_mqtt_attempt.Elapsed() > 60000 || initial_mqtt)
+      if (last_mqtt_attempt.Elapsed() > 20000 || initial_mqtt)
       {
         initial_mqtt = false;
         Serial.println("Trying to connect to MQTT Broker...");
