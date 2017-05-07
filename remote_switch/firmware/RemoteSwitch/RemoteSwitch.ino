@@ -109,6 +109,7 @@ void setup() {
   Serial.print("WiFi is connecting to ");
   Serial.println(WLAN_SSID);
 
+  WiFi.mode(WIFI_STA);
   WiFi.begin(WLAN_SSID, WLAN_PASS);
 
   mqtt.subscribe(&LZ_Sts);
