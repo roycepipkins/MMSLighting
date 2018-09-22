@@ -1,10 +1,9 @@
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
+#include <WiFi.h>
+#include <ESPmDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include <inttypes.h>
-#include <ESP8266WiFi.h>
 #include <MCP23S17.h>
 #include "MCP_IO.h"
 #include "LightZone.h"
@@ -12,11 +11,11 @@
 
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
-#define LIVE_MAKERSPACE
+#define DEMO_MAKERSPACE
 #include "Credentials.h"
 
-const int Wifi_LED = 5;
-const int Mqtt_LED = 4;
+const int Wifi_LED = 27;
+const int Mqtt_LED = 26;
 
 const char ota_hostname[]  = "LightMaster";
 
@@ -73,8 +72,9 @@ Adafruit_MQTT_Subscribe LZ8_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ8_Cmd_Topic, 
 
 Adafruit_MQTT_Subscribe* Zone_Cmd_Subs[] = {&LZ1_Cmd, &LZ2_Cmd, &LZ3_Cmd, &LZ4_Cmd, &LZ5_Cmd, &LZ6_Cmd, &LZ7_Cmd, &LZ8_Cmd};
 
-MCP ssrs(0, 15);
-MCP buttons(1, 15);
+SPIClass spi(HSPI);
+MCP ssrs(0, 15, spi);
+MCP buttons(1, 15, spi);
 MCP_IO mcp_io(&ssrs, &buttons);
 
 LightZone lz1(mcp_io, 0, 8,  24, 16);
@@ -111,7 +111,7 @@ void setup() {
   Serial.println("");
   Serial.println("----------------------");
   Serial.println("MMS Master Light Panel");
-  Serial.println("         v1.0         ");
+  Serial.println("         v2.0         ");
   Serial.println("----------------------");
 
   for(int i = 0; i < 8; ++i)
@@ -124,6 +124,14 @@ void setup() {
   digitalWrite(Wifi_LED, LOW);
   digitalWrite(Mqtt_LED, LOW);
 
+  spi.begin();
+  spi.setFrequency(1000000);
+  spi.setBitOrder(MSBFIRST);          // Sets _spi bus bit order (this is the default, setting it for good form!)
+  spi.setDataMode(SPI_MODE0); 
+  ssrs.begin();
+  buttons.begin();
+
+  
   // Connect to WiFi access point.
   Serial.println(); Serial.println();
   Serial.print("WiFi is connecting to ");
@@ -188,7 +196,16 @@ bool IsMQTTConnected()
       if (last_ping.Elapsed() >= 10000)
       {
         last_ping.Update();
-        if(!mqtt.ping())
+        bool ping_result = mqtt.ping();
+        uint32_t ping_elapsed = last_ping.Elapsed();
+        
+        if (ping_elapsed > 400)
+        {
+          Serial.print("mqtt.ping() took ");
+          Serial.print(ping_elapsed);
+          Serial.println("ms");
+        }
+        if(!ping_result)
         {
           mqtt.disconnect();
           digitalWrite(Mqtt_LED, LOW);
@@ -251,7 +268,15 @@ void loop()
     }
     else
     {
+      Timestamp ota_handle;
       ArduinoOTA.handle();
+      uint32_t elapsed = ota_handle.Elapsed();
+      if (elapsed > 400)
+      {
+        Serial.print("ArduinoOTA.handle() took ");
+        Serial.print(elapsed);
+        Serial.println("ms");
+      }
     }
   }
   
