@@ -178,6 +178,7 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(WLAN_SSID, WLAN_PASS);
+  WiFi.setAutoReconnect(true);
 
   Serial.println("WiFi begin has been called ");
 
