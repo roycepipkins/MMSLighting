@@ -58,6 +58,7 @@ Adafruit_MQTT_Publish LZ5_Sts = Adafruit_MQTT_Publish(&mqtt, LZ5_Sts_Topic, 1);
 Adafruit_MQTT_Publish LZ6_Sts = Adafruit_MQTT_Publish(&mqtt, LZ6_Sts_Topic, 1);
 Adafruit_MQTT_Publish LZ7_Sts = Adafruit_MQTT_Publish(&mqtt, LZ7_Sts_Topic, 1);
 Adafruit_MQTT_Publish LZ8_Sts = Adafruit_MQTT_Publish(&mqtt, LZ8_Sts_Topic, 1);
+Adafruit_MQTT_Publish Ping    = Adafruit_MQTT_Publish(&mqtt, "Lighting/master/ping", 0);
 
 Adafruit_MQTT_Publish* Zone_Status_Pubs[] = {&LZ1_Sts, &LZ2_Sts, &LZ3_Sts, &LZ4_Sts, &LZ5_Sts, &LZ6_Sts, &LZ7_Sts, &LZ8_Sts};
 
@@ -114,10 +115,6 @@ void setup() {
   Serial.println("         v2.0         ");
   Serial.println("----------------------");
 
-  for(int i = 0; i < 8; ++i)
-  {
-    lz[i]->Setup();
-  }
 
   pinMode(Wifi_LED, OUTPUT);
   pinMode(Mqtt_LED, OUTPUT);
@@ -125,11 +122,19 @@ void setup() {
   digitalWrite(Mqtt_LED, LOW);
 
   spi.begin();
-  spi.setFrequency(1000000);
-  spi.setBitOrder(MSBFIRST);          // Sets _spi bus bit order (this is the default, setting it for good form!)
-  spi.setDataMode(SPI_MODE0); 
+  //spi.setFrequency(1000000);
+  //spi.setBitOrder(MSBFIRST);          // Sets _spi bus bit order (this is the default, setting it for good form!)
+  //spi.setDataMode(SPI_MODE0); 
   ssrs.begin();
   buttons.begin();
+
+
+  for(int i = 0; i < 8; ++i)
+  {
+    lz[i]->Setup();
+  }
+
+
 
   
   // Connect to WiFi access point.
@@ -196,20 +201,7 @@ bool IsMQTTConnected()
       if (last_ping.Elapsed() >= 10000)
       {
         last_ping.Update();
-        bool ping_result = mqtt.ping();
-        uint32_t ping_elapsed = last_ping.Elapsed();
-        
-        if (ping_elapsed > 400)
-        {
-          Serial.print("mqtt.ping() took ");
-          Serial.print(ping_elapsed);
-          Serial.println("ms");
-        }
-        if(!ping_result)
-        {
-          mqtt.disconnect();
-          digitalWrite(Mqtt_LED, LOW);
-        }
+        Ping.publish("ping");
       }
       return true;
     }
@@ -303,6 +295,10 @@ void loop()
             }
           }
           if (mystrncasecmp("Off", (char*)(subscription->lastread), 3) == 0)
+          {
+            lz[i]->TurnOff();
+          }
+          if (mystrncasecmp("RemoteOff", (char*)(subscription->lastread), 9) == 0)
           {
             if (lz[i]->StartPendingOff())
             {

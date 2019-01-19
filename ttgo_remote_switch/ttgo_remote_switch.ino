@@ -23,7 +23,7 @@
 #include "Pending_OFF_Red.h"
 #include "ScopedLock.h"
 #include "DBButton.h"
-#include <M5Stack.h>
+
 
 SPIClass hspi(HSPI);
 
@@ -101,29 +101,55 @@ const int status_y_offset = 20;
 const int prgm_x_offset = 60;
 const int prgm_y_offset = 0;
 
+#define SPEAKER_PIN 25
+#define TONE_PIN_CHANNEL 0
+#define BEEP_FREQ 1000
+
+void SpeakerSetup()
+{
+  ledcSetup(TONE_PIN_CHANNEL, 0, 13);
+  ledcAttachPin(SPEAKER_PIN, TONE_PIN_CHANNEL);
+}
+
+void Beep()
+{
+  ledcWriteTone(TONE_PIN_CHANNEL, BEEP_FREQ);
+}
+
+void Mute()
+{
+  ledcWriteTone(TONE_PIN_CHANNEL, 0);
+  digitalWrite(SPEAKER_PIN, 0);
+}
+
 void UpdateStatus(void*)
 {
+  SpeakerSetup();
+
   while(true)
   {
     EventBits_t status_bits = xEventGroupWaitBits(status_bits_handle, ZONE_STATUS_BITS, pdTRUE, pdFALSE, portMAX_DELAY);
     if (status_bits & ZONE_PROGRAMMING)
     {
-      M5.Speaker.beep();
+      Beep();
       ScopedLock locker(mu_tft);
       tft.fillRect(prgm_x_offset, prgm_y_offset, 16, 16, 0);
       tft.drawChar(prgm_x_offset, prgm_y_offset, zone_index + 49, ST7735_GREEN,ST7735_BLACK, 2);
+      Mute();
     }
     else if (status_bits & ZONE_STATUS_ON)
     {
-      M5.Speaker.beep();
+      Beep();
       ScopedLock locker(mu_tft);
       on_image.draw(tft, status_x_offset, status_y_offset);
+      Mute();
     }
     else if (status_bits & ZONE_STATUS_OFF)
     {
-      M5.Speaker.beep();
+      Beep();
       ScopedLock locker(mu_tft);
       off_image.draw(tft, status_x_offset, status_y_offset);
+      Mute();
     }
     else if (status_bits & ZONE_STATUS_PENDING_OFF)
     {
@@ -137,14 +163,16 @@ void UpdateStatus(void*)
           ScopedLock locker(mu_tft);
           tft.invertDisplay(true);
         }
-        M5.Speaker.beep();
+        Beep();
         vTaskDelay(200);
+        Mute();
         {
           ScopedLock locker(mu_tft);
           tft.invertDisplay(false);
         }
-        M5.Speaker.beep();
+        
         vTaskDelay(200);
+        
       }
     }
   }
@@ -154,9 +182,6 @@ void setup() {
   status_bits_handle = xEventGroupCreate();
   mu_tft = xSemaphoreCreateMutex();
   
-  M5.Speaker.begin();
-  M5.Speaker.setVolume(8);
-
   hspi.setFrequency(80000000);
   hspi.begin(5, -1, 23, -1);
 
@@ -298,7 +323,7 @@ void DisplayMQTTStatus(bool status)
 bool IsMQTTConnected()
 {
   static Timestamp ten_secs;
-
+  static Timestamp wifi_down;
   static Timestamp last_ping;
   static Timestamp last_mqtt_attempt;
   static bool initial_mqtt = true;
@@ -314,6 +339,7 @@ bool IsMQTTConnected()
   if (WiFi.status() == WL_CONNECTED)
   {
     DisplayWifiStatus( HIGH);
+    wifi_down.Update();
 
     if (mqtt.connected()) 
     {
@@ -355,6 +381,11 @@ bool IsMQTTConnected()
     DisplayWifiStatus(LOW);
     DisplayMQTTStatus(LOW);
     mqtt.disconnect();
+
+    if (wifi_down.Elapsed() > 30000)
+    {
+      ESP.restart();
+    }
   }
 
   return ret;
@@ -418,7 +449,7 @@ void loop() {
     
 
   
-    M5.Speaker.update();
+    
     
     if (Button_ON.isPressed())
     {
@@ -436,7 +467,7 @@ void loop() {
         Serial.print("Zone #");
         Serial.print(zone_index + 1);
         Serial.println(" -> Off");
-        //M5.Speaker.beep();
+        
     }
 
     if (Button_PRGM.isPressed())
@@ -450,7 +481,7 @@ void loop() {
       Serial.print("Zone #");
       Serial.print(zone_index + 1);
       Serial.println(" -> Programmed");
-      //M5.Speaker.beep();
+      
     }
   }
 }

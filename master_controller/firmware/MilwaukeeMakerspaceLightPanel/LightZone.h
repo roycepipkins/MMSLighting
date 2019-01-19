@@ -11,12 +11,13 @@ public:
 
   bool StartPendingOff();
   bool TurnOn();
+  void TurnOff();
 
   const char* GetStatusText() const;
 
 private:
 
-  void TurnOff();
+  
   
   ArdGPIO& gpio;
   int cmdPin;
@@ -59,3 +60,4 @@ private:
   void UpdateLED();
   void CheckPendingOff();
 };
+
