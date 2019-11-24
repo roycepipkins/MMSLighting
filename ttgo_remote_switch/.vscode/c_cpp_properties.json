@@ -3,15 +3,15 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\Users\\Royce\\AppData\\Local\\Arduino15\\packages\\esp32\\tools\\**",
-                "C:\\Users\\Royce\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.0\\**",
-                "C:\\Users\\Royce\\Documents\\Arduino\\Libraries"
+                "${workspaceFolder}/**",
+                "C:\\Users\\Royce\\Documents\\Arduino\\Libraries\\**",
+                "C:\\Users\\Royce\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.2\\**"
             ],
             "forcedInclude": [],
-            "intelliSenseMode": "msvc-x64",
-            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.15.26726/bin/Hostx64/x64/cl.exe",
+            "compilerPath": "C:/Users/Royce/AppData/Local/Arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/1.22.0-80-g6c4433a-5.2.0/bin/xtensa-esp32-elf-c++.exe",
             "cStandard": "c11",
-            "cppStandard": "c++17"
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

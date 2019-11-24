@@ -23,6 +23,8 @@
 #include "Pending_OFF_Red.h"
 #include "ScopedLock.h"
 #include "DBButton.h"
+#include <time.h>
+#include "NTPTime.h"
 
 
 SPIClass hspi(HSPI);
@@ -38,6 +40,10 @@ const char Mqtt_Server[]    = MQTT_SERVER;
 const char Mqtt_Username[]  = MQTT_USERNAME;
 const char Mqtt_Password[]  = MQTT_KEY;
 
+const char ntp_server[] = "north-america.pool.ntp.org";
+const char timezone_desc[] = "CST6CDT,M3.2.0,M11.1.0";
+
+NTPTime ntp_time;
 
 const std::vector<std::string> LZ_Sts_Topics 
 {
@@ -90,11 +96,12 @@ uint8_t zone_index = 5;
 
 SemaphoreHandle_t mu_tft;
 EventGroupHandle_t status_bits_handle;
-const int ZONE_STATUS_BITS        = 15; 
+const int ZONE_STATUS_BITS        = 31; 
 const int ZONE_STATUS_OFF         = 1;
 const int ZONE_STATUS_ON          = 2;
 const int ZONE_STATUS_PENDING_OFF = 4;
 const int ZONE_PROGRAMMING        = 8;
+const int TIME_TICK               = 16;
 
 const int status_x_offset = 15;
 const int status_y_offset = 20;
@@ -175,7 +182,25 @@ void UpdateStatus(void*)
         
       }
     }
+    else if (status_bits & TIME_TICK)
+    {
+      drawTime();
+    }
   }
+}
+
+void drawTime()
+{
+  int x_offset = 50;
+  const int y_offset = 110;
+  auto time_str = ntp_time.current_local_hhmmss();
+
+  ScopedLock locker(mu_tft);
+  for(int i=0; i < time_str.size(); ++i, x_offset += 10)
+  {
+    tft.drawChar(x_offset, y_offset, time_str[i], ST7735_WHITE,ST7735_BLACK, 2);
+  }
+  
 }
 
 void setup() {
@@ -192,7 +217,7 @@ void setup() {
   Serial.println("");
   Serial.println("-------------------------");
   Serial.println("MMS Remote Light Switch  ");
-  Serial.println("         v2.0            ");
+  Serial.println("         v2.1            ");
   Serial.println("-------------------------");
 
 
@@ -266,7 +291,9 @@ void setup() {
   tft.setRotation(1);                                      // 
   
   tft.drawChar(prgm_x_offset, prgm_y_offset, zone_index + 49, ST7735_GREEN,ST7735_BLACK, 2);
-  
+
+
+  ntp_time.begin(ntp_server, timezone_desc);
 
 }
 
@@ -326,6 +353,7 @@ bool IsMQTTConnected()
   static Timestamp wifi_down;
   static Timestamp last_ping;
   static Timestamp last_mqtt_attempt;
+  static Timestamp mqtt_down;
   static bool initial_mqtt = true;
   static bool initial_wifi = true;
   bool ret = false;
@@ -344,6 +372,7 @@ bool IsMQTTConnected()
     if (mqtt.connected()) 
     {
       DisplayMQTTStatus(HIGH);
+      mqtt_down.Update();
       if (last_ping.Elapsed() >= 30000)
       {
         last_ping.Update();
@@ -382,7 +411,8 @@ bool IsMQTTConnected()
     DisplayMQTTStatus(LOW);
     mqtt.disconnect();
 
-    if (wifi_down.Elapsed() > 30000)
+    if (wifi_down.Elapsed() > 30000 ||
+        mqtt_down.Elapsed() > 30000)
     {
       ESP.restart();
     }
@@ -401,7 +431,7 @@ void loop() {
   static Timestamp loop_timer;
 
   if (WiFi.status() == WL_CONNECTED)
-  {
+  { 
     if (initial_wifi)
     {
       ArduinoOTA.begin();
@@ -414,8 +444,23 @@ void loop() {
     {
       ArduinoOTA.handle();
     }
+    last_status = true;
   }
-
+  else
+  {
+    if (last_status)
+    {
+      loop_timer.Update();
+    }
+    else
+    {
+      if (loop_timer.Elapsed() > 30000)
+      {
+        ESP.restart();
+      }
+    }
+    last_status = false;
+  }
   
   
   if (IsMQTTConnected())
@@ -484,4 +529,23 @@ void loop() {
       
     }
   }
+
+  static Timestamp print_timer;
+  if (print_timer.Elapsed() > 1000)
+  {
+    Serial.println(ntp_time.current_local_hhmmss().c_str());
+    print_timer.Update();
+    xEventGroupSetBits(status_bits_handle, TIME_TICK);
+  }
+
+  tm now = {0};
+  ntp_time.current_local_time(now);
+  if (now.tm_hour == 2 && 
+      now.tm_min == 0 && 
+      now.tm_sec < 5 && 
+      loop_timer.Elapsed() > 60000)
+  {
+    ESP.restart();
+  }
+
 }
