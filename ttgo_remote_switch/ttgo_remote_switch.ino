@@ -40,7 +40,7 @@ const char Mqtt_Server[]    = MQTT_SERVER;
 const char Mqtt_Username[]  = MQTT_USERNAME;
 const char Mqtt_Password[]  = MQTT_KEY;
 
-const char ntp_server[] = "north-america.pool.ntp.org";
+const char ntp_server[] = "10.1.1.1";
 const char timezone_desc[] = "CST6CDT,M3.2.0,M11.1.0";
 
 NTPTime ntp_time;
