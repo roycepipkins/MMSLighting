@@ -29,10 +29,10 @@
 
 SPIClass hspi(HSPI);
 
-Adafruit_ST7735 tft = Adafruit_ST7735(&hspi, 16, 17, 9 ); // CS,A0,SDA,SCK,RESET
-//Adafruit_ST7735 tft = Adafruit_ST7735(16, 17, 23, 5, 9); // CS,A0,SDA,SCK,RESET
+//Adafruit_ST7735 tft = Adafruit_ST7735(&hspi, 16, 17, 9 ); // CS,A0,SDA,SCK,RESET
+Adafruit_ST7735 tft = Adafruit_ST7735(16, 17, 23, 5, 9); // CS,A0,SDA,SCK,RESET
 
-#define AT_MAKERSPACE
+#define AT_HOME
 #include "Credentials.h"
 
 

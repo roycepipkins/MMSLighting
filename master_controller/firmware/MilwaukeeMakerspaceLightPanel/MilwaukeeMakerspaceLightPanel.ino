@@ -1,23 +1,50 @@
 #include <Arduino.h>
+#include <SPI.h>
 #include <WiFi.h>
+#include <ETH.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include <inttypes.h>
 #include <MCP23S17.h>
+#include <PubSubClient.h>
 #include "MCP_IO.h"
-#include "LightZone.h"
+
 #include "Timestamp.h"
 
-#include "Adafruit_MQTT.h"
-#include "Adafruit_MQTT_Client.h"
+
 #define DEMO_MAKERSPACE
 #include "Credentials.h"
 
-const int Wifi_LED = 27;
-const int Mqtt_LED = 26;
+const int expansion_io_count = 0;
 
-const char ota_hostname[]  = "LightMaster";
+
+//TODO sign up for status request. Also publish status on boot
+
+//***************************************************************************************
+//EDIT values below for the correct panel number, etc 
+//TODO you should probably take the number from an input on the board. A 4 bit DIP or something.
+
+const char topic_prefix[] = "lighting/panel_1";
+const char command_suffix[] = "/command";
+const char status_suffix[] = "/status";
+const char channel_prefix[] = "/channel_";
+const char status_request_topic[] = "/lighting/status_request";
+
+//Command topics will be topic_prefix + channel_prefix + channel_id + command_suffix
+//E.x.: lighting/panel_1/channel_5/command
+//Status topics will be topic_prefix + channel_prefix + channel_id + status_suffix
+//E.x.: lighting/panel_1/channel_5/status
+
+//***************************************************************************************
+
+
+
+
+const int Wifi_LED = 33;
+const int Mqtt_LED = 32;
+
+
 
 // Store the MQTT server, username, and password in flash memory.
 // This is required for using the Adafruit MQTT library.
@@ -25,71 +52,22 @@ const char Mqtt_Server[]     = MQTT_SERVER;
 const char Mqtt_Username[]   = MQTT_USERNAME;
 const char Mqtt_Password[]   = MQTT_KEY;
 
-//Cmd will ON/OFF
-//Sts will be ON, OVERRIDDEN, PENDING_OFF, OFF
 
-const char LZ1_Cmd_Topic[]  = "Lighting/LZ1_Cmd";
-const char LZ2_Cmd_Topic[]  = "Lighting/LZ2_Cmd";
-const char LZ3_Cmd_Topic[]  = "Lighting/LZ3_Cmd";
-const char LZ4_Cmd_Topic[]  = "Lighting/LZ4_Cmd";
-const char LZ5_Cmd_Topic[]  = "Lighting/LZ5_Cmd";
-const char LZ6_Cmd_Topic[]  = "Lighting/LZ6_Cmd";
-const char LZ7_Cmd_Topic[]  = "Lighting/LZ7_Cmd";
-const char LZ8_Cmd_Topic[]  = "Lighting/LZ8_Cmd";
-
-const char LZ1_Sts_Topic[]  = "Lighting/LZ1_Sts";
-const char LZ2_Sts_Topic[]  = "Lighting/LZ2_Sts";
-const char LZ3_Sts_Topic[]  = "Lighting/LZ3_Sts";
-const char LZ4_Sts_Topic[]  = "Lighting/LZ4_Sts";
-const char LZ5_Sts_Topic[]  = "Lighting/LZ5_Sts";
-const char LZ6_Sts_Topic[]  = "Lighting/LZ6_Sts";
-const char LZ7_Sts_Topic[]  = "Lighting/LZ7_Sts";
-const char LZ8_Sts_Topic[]  = "Lighting/LZ8_Sts";
-
-
-WiFiClient client;
-Adafruit_MQTT_Client mqtt(&client, Mqtt_Server, MQTT_SERVERPORT, Mqtt_Username, Mqtt_Password);
-
-Adafruit_MQTT_Publish LZ1_Sts = Adafruit_MQTT_Publish(&mqtt, LZ1_Sts_Topic, 1);
-Adafruit_MQTT_Publish LZ2_Sts = Adafruit_MQTT_Publish(&mqtt, LZ2_Sts_Topic, 1);
-Adafruit_MQTT_Publish LZ3_Sts = Adafruit_MQTT_Publish(&mqtt, LZ3_Sts_Topic, 1);
-Adafruit_MQTT_Publish LZ4_Sts = Adafruit_MQTT_Publish(&mqtt, LZ4_Sts_Topic, 1);
-Adafruit_MQTT_Publish LZ5_Sts = Adafruit_MQTT_Publish(&mqtt, LZ5_Sts_Topic, 1);
-Adafruit_MQTT_Publish LZ6_Sts = Adafruit_MQTT_Publish(&mqtt, LZ6_Sts_Topic, 1);
-Adafruit_MQTT_Publish LZ7_Sts = Adafruit_MQTT_Publish(&mqtt, LZ7_Sts_Topic, 1);
-Adafruit_MQTT_Publish LZ8_Sts = Adafruit_MQTT_Publish(&mqtt, LZ8_Sts_Topic, 1);
-Adafruit_MQTT_Publish Ping    = Adafruit_MQTT_Publish(&mqtt, "Lighting/master/ping", 0);
-
-Adafruit_MQTT_Publish* Zone_Status_Pubs[] = {&LZ1_Sts, &LZ2_Sts, &LZ3_Sts, &LZ4_Sts, &LZ5_Sts, &LZ6_Sts, &LZ7_Sts, &LZ8_Sts};
-
-Adafruit_MQTT_Subscribe LZ1_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ1_Cmd_Topic, 1);
-Adafruit_MQTT_Subscribe LZ2_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ2_Cmd_Topic, 1);
-Adafruit_MQTT_Subscribe LZ3_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ3_Cmd_Topic, 1);
-Adafruit_MQTT_Subscribe LZ4_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ4_Cmd_Topic, 1);
-Adafruit_MQTT_Subscribe LZ5_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ5_Cmd_Topic, 1);
-Adafruit_MQTT_Subscribe LZ6_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ6_Cmd_Topic, 1);
-Adafruit_MQTT_Subscribe LZ7_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ7_Cmd_Topic, 1);
-Adafruit_MQTT_Subscribe LZ8_Cmd = Adafruit_MQTT_Subscribe(&mqtt, LZ8_Cmd_Topic, 1);
-
-Adafruit_MQTT_Subscribe* Zone_Cmd_Subs[] = {&LZ1_Cmd, &LZ2_Cmd, &LZ3_Cmd, &LZ4_Cmd, &LZ5_Cmd, &LZ6_Cmd, &LZ7_Cmd, &LZ8_Cmd};
 
 SPIClass spi(HSPI);
-MCP ssrs(0, 15, spi);
-MCP buttons(1, 15, spi);
-MCP_IO mcp_io(&ssrs, &buttons);
+const int slaveSelect = 14;
+MCP_IO mcp_io(spi, slaveSelect);
 
-LightZone lz1(mcp_io, 0, 8,  24, 16);
-LightZone lz2(mcp_io, 1, 9,  25, 17);
-LightZone lz3(mcp_io, 2, 10, 26, 18);
-LightZone lz4(mcp_io, 3, 11, 27, 19);
-LightZone lz5(mcp_io, 4, 12, 28, 20);
-LightZone lz6(mcp_io, 5, 13, 29, 21);
-LightZone lz7(mcp_io, 6, 14, 30, 22);
-LightZone lz8(mcp_io, 7, 15, 31, 23);
+const int connection_retries = 30;
+int disconnect_counter = connection_retries;
+void onMQTT(char* topic, byte* payload, unsigned int length);
+WiFiClient client; //Still OK for Ethernet
+PubSubClient pubSub(MQTT_SERVER, MQTT_SERVERPORT, onMQTT, client);
 
-LightZone* lz[8] = {&lz1, &lz2, &lz3, &lz4, &lz5, &lz6, &lz7, &lz8};
 
-int mystrncasecmp(const char* s1, const char* s2, int len)
+
+
+int strincmp(const char* s1, const char* s2, int len)
 {
   int i;
   for(i = 0; i < len && s1[i] && s2[i]; ++i)
@@ -103,6 +81,50 @@ int mystrncasecmp(const char* s1, const char* s2, int len)
   return (!s1[i] && !s2[i] ? 0 : 1);
 }
 
+volatile bool eth_connected = false;
+
+void WiFiEvent(WiFiEvent_t event)
+{
+  switch (event) {
+    case SYSTEM_EVENT_ETH_START:
+      Serial.println("ETH Started");
+      //set eth hostname here
+      {
+        String hostname = "MstrLght_";
+        hostname += ETH.macAddress();
+        ETH.setHostname(hostname.c_str());
+      }
+      break;
+    case SYSTEM_EVENT_ETH_CONNECTED:
+      Serial.println("ETH Connected");
+      break;
+    case SYSTEM_EVENT_ETH_GOT_IP:
+      Serial.print("ETH MAC: ");
+      Serial.print(ETH.macAddress());
+      Serial.print(", IPv4: ");
+      Serial.print(ETH.localIP());
+      if (ETH.fullDuplex()) {
+        Serial.print(", FULL_DUPLEX");
+      }
+      Serial.print(", ");
+      Serial.print(ETH.linkSpeed());
+      Serial.println("Mbps");
+      eth_connected = true;
+      break;
+    case SYSTEM_EVENT_ETH_DISCONNECTED:
+      Serial.println("ETH Disconnected");
+      eth_connected = false;
+      break;
+    case SYSTEM_EVENT_ETH_STOP:
+      Serial.println("ETH Stopped");
+      eth_connected = false;
+      break;
+    default:
+      break;
+  }
+}
+
+
 void setup() {
 
   Serial.begin(115200);
@@ -112,7 +134,7 @@ void setup() {
   Serial.println("");
   Serial.println("----------------------");
   Serial.println("MMS Master Light Panel");
-  Serial.println("         v2.0         ");
+  Serial.println("         v3.0         ");
   Serial.println("----------------------");
 
 
@@ -121,44 +143,35 @@ void setup() {
   digitalWrite(Wifi_LED, LOW);
   digitalWrite(Mqtt_LED, LOW);
 
-  spi.begin();
-  //spi.setFrequency(1000000);
-  //spi.setBitOrder(MSBFIRST);          // Sets _spi bus bit order (this is the default, setting it for good form!)
-  //spi.setDataMode(SPI_MODE0); 
-  ssrs.begin();
-  buttons.begin();
-
-
-  for(int i = 0; i < 8; ++i)
+  spi.begin(13, 4, 3);
+  spi.setFrequency(10000);
+  for(int i = 0; i < (16 + 16*expansion_io_count); ++i)
   {
-    lz[i]->Setup();
+    mcp_io.pinMode(i, OUTPUT);
   }
 
-
-
-  
   // Connect to WiFi access point.
   Serial.println(); Serial.println();
-  Serial.print("WiFi is connecting to ");
-  Serial.println(WLAN_SSID);
-
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WLAN_SSID, WLAN_PASS);
-
-  mqtt.subscribe(&LZ1_Cmd);
-  mqtt.subscribe(&LZ2_Cmd);
-  mqtt.subscribe(&LZ3_Cmd);
-  mqtt.subscribe(&LZ4_Cmd);
-  mqtt.subscribe(&LZ5_Cmd);
-  mqtt.subscribe(&LZ6_Cmd);
-  mqtt.subscribe(&LZ7_Cmd);
-  mqtt.subscribe(&LZ8_Cmd);
-
-  for(int i = 24; i < 32; ++i)
+  Serial.print("Ethernet starting.");
+  WiFi.onEvent(WiFiEvent);
+  ETH.begin();
+  
+  //With the High Voltage bypass switches, there are no local buttons.
+  //With no local buttons, an active network is the only useful state.
+  int retries = 30;
+  while(!eth_connected)
   {
-    mcp_io.inputInvert(i, 1);
-    
+    delay(1000);
+    Serial.print(".");
+    if (retries == 0)
+    {
+      Serial.println("");
+      Serial.println("Ethernet didn't start in time. Restarting in five seconds.");
+      delay(5000);
+      ESP.restart();
+    }
   }
+
 
   ArduinoOTA.onStart([]() {
     Serial.println("OTA Start");
@@ -178,147 +191,160 @@ void setup() {
     else if (error == OTA_END_ERROR) Serial.println("OTA End Failed");
   });
   
-  ArduinoOTA.setHostname(ota_hostname);
+  ArduinoOTA.setHostname(ETH.getHostname());
 #ifdef OTA_PASSWORD
   ArduinoOTA.setPassword(OTA_PASSWORD);
 #endif
 
-  Serial.println("Starting");
+  Serial.println("Connecting to MQTT...");
+  if (pubSub.connect(ETH.getHostname()))
+  {
+    Serial.println("Connected to MQTT.");
+    subscribeToTopics();
+  }
+  else
+  {
+    Serial.println("Failed to connected to MQTT!");
+  }
+
+  Serial.println("Starting Light Controller.");
 }
 
-bool IsMQTTConnected()
+void subscribeToTopics()
 {
-  static Timestamp last_ping;
-  static Timestamp last_mqtt_attempt;
-  static bool initial_mqtt = true;
-  
-  if (WiFi.status() == WL_CONNECTED)
+  String subscription_topic(topic_prefix);
+  subscription_topic += "/+";
+  subscription_topic += command_suffix;
+
+  if (pubSub.subscribe(subscription_topic.c_str(), 1))
   {
-    digitalWrite(Wifi_LED, HIGH);
-    if (mqtt.connected()) 
+    Serial.print("Subscribed to: ");
+    Serial.println(subscription_topic);
+  }
+  else
+  {
+    Serial.println("Failed to subscribe! Will restart in five seconds...");
+    delay(5000);
+    ESP.restart();
+  }
+  
+  if (pubSub.subscribe(status_request_topic, 1))
+  {
+    Serial.print("Subscribed to: ");
+    Serial.println(subscription_topic);
+  }
+  else
+  {
+    Serial.println("Failed to subscribe! Will restart in five seconds...");
+    delay(5000);
+    ESP.restart();
+  }
+
+}
+
+int payloadToCommand(byte* payload)
+{
+  //Infer the meaning of the payload
+  if (payload[0] == 0) return 0;
+  if (payload[0] == 1) return 1;
+  if (payload[0] == '0') return 0;
+  if (payload[0] == '1') return 1;
+  char* data = (char*)payload;
+  if (strincmp(data, "on", 2) == 0) return 1;
+  if (strincmp(data, "true", 4) == 0) return 1;
+  if (strincmp(data, "high", 4) == 0) return 1;
+  return 0;
+}
+
+void publishAllStatus()
+{
+  for(int channel = 0; channel < 16; ++channel)
+  {
+    String status = mcp_io.digitalRead(channel) != 0 ? "ON" : "OFF";
+    String status_topic(topic_prefix);
+    status_topic += channel_prefix;
+    status_topic += channel;
+    status_topic += status_suffix;
+    pubSub.publish(status_topic.c_str(), status.c_str());
+  }
+}
+
+
+void onMQTT(char* topic, byte* payload, unsigned int length)
+{
+  if (strcmp(status_request_topic, topic) == 0)
+  {
+    publishAllStatus();
+  }
+  else
+  {
+    String subscription_prefix(topic_prefix);
+    subscription_prefix += channel_prefix;
+    int prefix_len = subscription_prefix.length();
+  
+    if (strlen(topic) > prefix_len && 
+        isdigit(topic[prefix_len] && 
+        length > 0) && 
+        (0 == strincmp(topic, subscription_prefix.c_str(), prefix_len)))
     {
-      digitalWrite(Mqtt_LED, HIGH);
-      if (last_ping.Elapsed() >= 10000)
-      {
-        last_ping.Update();
-        Ping.publish("ping");
-      }
-      return true;
+      int channel = atoi(&topic[prefix_len]);
+      int command = payloadToCommand(payload); 
+      mcp_io.digitalWrite(channel, command);
+      String status = mcp_io.digitalRead(channel) != 0 ? "ON" : "OFF";
+      String status_topic(topic_prefix);
+      status_topic += channel_prefix;
+      status_topic += channel;
+      status_topic += status_suffix;
+      pubSub.publish(status_topic.c_str(), status.c_str());
+      
+      
+      Serial.print("Commanded Channel ");
+      Serial.print(channel);
+      Serial.print(" to ");
+      Serial.println(command);
     }
-    else
+  } 
+}
+
+void reconnectPubSub()
+{
+  Serial.println("Reconnecting to MQTT Server...");
+  if (pubSub.connect(ETH.getHostname()))
+  {
+    Serial.println("Connected to MQTT Server");
+    subscribeToTopics();
+  }
+  else
+  {
+    Serial.println("Failed to connect MQTT Server");
+  }
+  
+}
+
+
+void loop()
+{
+  if (eth_connected)
+  {
+    disconnect_counter = connection_retries;
+    ArduinoOTA.handle();
+    if (!pubSub.loop())
     {
-      digitalWrite(Mqtt_LED, LOW);
-      mqtt.disconnect();
-      if (last_mqtt_attempt.Elapsed() > 20000 || initial_mqtt)
-      {
-        initial_mqtt = false;
-        Serial.println("Trying to connect to MQTT Broker...");
-        if (mqtt.connect() == 0) 
-        {
-          Serial.println("MQTT Connected.");
-          digitalWrite(Mqtt_LED, HIGH);
-          return true;
-        }
-        else
-          Serial.println("MQTT connection failed");
-        last_mqtt_attempt.Update();
-      }
+      reconnectPubSub();
     }
   }
   else
   {
-    digitalWrite(Wifi_LED, LOW);
-    digitalWrite(Mqtt_LED, LOW);
-    mqtt.disconnect();
-  }
-
-  return false;
-}
-
-void PrintState(const int i, const char* state)
-{
-  Serial.print("Zone #"),
-  Serial.print(i, DEC);
-  Serial.print(" state is now: ");
-  Serial.println(state);
-}
-
-void loop()
-{
-
-  static bool initial_wifi = true;
-
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    if (initial_wifi)
+    if (--disconnect_counter == 0)
     {
-      ArduinoOTA.begin();
-      Serial.println("OTA Begin");
-      Serial.print("My IP address: ");
-      Serial.println(WiFi.localIP());
-      initial_wifi = false;
+      Serial.println("Ethernet still not connected. Restarting in five seconds");
+      delay(5000);
+      ESP.restart();
     }
     else
     {
-      Timestamp ota_handle;
-      ArduinoOTA.handle();
-      uint32_t elapsed = ota_handle.Elapsed();
-      if (elapsed > 400)
-      {
-        Serial.print("ArduinoOTA.handle() took ");
-        Serial.print(elapsed);
-        Serial.println("ms");
-      }
-    }
-  }
-  
-  if (IsMQTTConnected())
-  {
-    Adafruit_MQTT_Subscribe *subscription = 0;
-
-    while (subscription = mqtt.readSubscription(10))
-    {
-      for(int i = 0; i < 8; ++i)
-      {
-        if (subscription == Zone_Cmd_Subs[i])
-        {
-          Serial.print("MQTT: Zone ");
-          Serial.print(i);
-          Serial.print(" ");
-          Serial.println((char*)(subscription->lastread));
-          if (mystrncasecmp("On", (char*)(subscription->lastread), 2) == 0)
-          {
-            if (lz[i]->TurnOn())
-            {
-              //Zone_Status_Pubs[i]->publish(lz[i]->GetStatusText());
-              //PrintState(i, lz[i]->GetStatusText());
-            }
-          }
-          if (mystrncasecmp("Off", (char*)(subscription->lastread), 3) == 0)
-          {
-            lz[i]->TurnOff();
-          }
-          if (mystrncasecmp("RemoteOff", (char*)(subscription->lastread), 9) == 0)
-          {
-            if (lz[i]->StartPendingOff())
-            {
-              //Zone_Status_Pubs[i]->publish(lz[i]->GetStatusText());
-              //PrintState(i, lz[i]->GetStatusText());
-            }
-          }
-          break;
-        }
-      }
-    }
-  }
-
-  for(int i = 0; i < 8; ++i)
-  {
-    if (lz[i]->Update())
-    {
-        Serial.println("Update");
-        if (IsMQTTConnected()) Zone_Status_Pubs[i]->publish(lz[i]->GetStatusText());
-        PrintState(i, lz[i]->GetStatusText());
+      Serial.println("Ethernet not connected. Waiting for better times.");
+      delay(1000);
     }
   }
 }
