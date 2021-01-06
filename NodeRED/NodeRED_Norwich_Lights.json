@@ -1,0 +1,439 @@
+[
+    {
+        "id": "775b9f94.b67a",
+        "type": "tab",
+        "label": "MMS2Lights",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "cb0ad72e.ce0958",
+        "type": "websocket in",
+        "z": "775b9f94.b67a",
+        "name": "Lighting WebSocket In",
+        "server": "6caa95ab.a3453c",
+        "client": "",
+        "x": 120,
+        "y": 140,
+        "wires": [
+            [
+                "20b45542.29473a",
+                "2079d0ba.69467"
+            ]
+        ]
+    },
+    {
+        "id": "fab4d512.c83828",
+        "type": "websocket out",
+        "z": "775b9f94.b67a",
+        "name": "Lighting WebSocket Out",
+        "server": "6caa95ab.a3453c",
+        "client": "",
+        "x": 1030,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "606b8032.17165",
+        "type": "switch",
+        "z": "775b9f94.b67a",
+        "name": "Type Switch",
+        "property": "payload.type",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "command",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ping",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "status_request",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 450,
+        "y": 140,
+        "wires": [
+            [
+                "33f8684d.131088"
+            ],
+            [
+                "21d78276.c9078e"
+            ],
+            [
+                "15951fdf.bfdd3"
+            ]
+        ]
+    },
+    {
+        "id": "21d78276.c9078e",
+        "type": "change",
+        "z": "775b9f94.b67a",
+        "name": "Ping-to-Pong",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"type\":\"pong\"}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 690,
+        "y": 140,
+        "wires": [
+            [
+                "fab4d512.c83828"
+            ]
+        ]
+    },
+    {
+        "id": "56b5d5dc.fa8b9c",
+        "type": "watch",
+        "z": "775b9f94.b67a",
+        "name": "Watch GPIO Map",
+        "files": "/home/debian/gpiomap.csv",
+        "recursive": "",
+        "x": 160,
+        "y": 540,
+        "wires": [
+            [
+                "893abc58.95fdd"
+            ]
+        ]
+    },
+    {
+        "id": "cbd2f7c3.a56648",
+        "type": "csv",
+        "z": "775b9f94.b67a",
+        "name": "Parse",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "GPIO,Zone_Name",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 570,
+        "y": 540,
+        "wires": [
+            [
+                "d9a905aa.aec558",
+                "42f0eb01.f311d4"
+            ]
+        ]
+    },
+    {
+        "id": "893abc58.95fdd",
+        "type": "file in",
+        "z": "775b9f94.b67a",
+        "name": "Read GPIO Map",
+        "filename": "",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 370,
+        "y": 540,
+        "wires": [
+            [
+                "cbd2f7c3.a56648"
+            ]
+        ]
+    },
+    {
+        "id": "d9a905aa.aec558",
+        "type": "debug",
+        "z": "775b9f94.b67a",
+        "name": "Parsed Map",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "42f0eb01.f311d4",
+        "type": "function",
+        "z": "775b9f94.b67a",
+        "name": "Set Flow Context",
+        "func": "var count = msg.payload.length;\nvar topic_map = msg.payload;\nvar topic_to_zone = {};\nvar zone_to_topic = {};\nfor(i = 0; i < count; ++i)\n{\n    topic_to_zone[topic_map[i][\"GPIO_Topic\"]+\"/status\"] = topic_map[i][\"Zone_Name\"];\n    zone_to_topic[topic_map[i][\"Zone_Name\"]] = topic_map[i][\"GPIO_Topic\"] + \"/command\";\n}\nflow.set(\"topic_to_zone\", topic_to_zone);\nflow.set(\"zone_to_topic\", zone_to_topic);\nflow.set(\"version\", 2);\n\n",
+        "outputs": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 780,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "270b8c4a.554a64",
+        "type": "inject",
+        "z": "775b9f94.b67a",
+        "name": "Run at start",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "filename",
+                "v": "/home/debian/gpiomap.csv",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 480,
+        "wires": [
+            [
+                "893abc58.95fdd",
+                "a9fd8fee.37b68"
+            ]
+        ]
+    },
+    {
+        "id": "33f8684d.131088",
+        "type": "function",
+        "z": "775b9f94.b67a",
+        "name": "Zone To Topic to MQTT",
+        "func": "var reply_msg = msg;\nvar mqtt_msg = null;\n\nif (msg.payload.version == flow.get(\"version\"))\n{\n    var zone_to_topic = flow.get(\"zone_to_topic\");\n    var topic = zone_to_topic[msg.payload.zone];\n    \n    \n    if (typeof topic !== 'undefined')\n    {\n        mqtt_msg = {};\n        mqtt_msg.topic = topic;\n        mqtt_msg.payload = msg.payload.command;\n        reply_msg.payload.reply = \"OK\";\n    }\n    else\n    {\n        reply_msg.payload.reply = \"Error\";\n        reply_msg.payload.zone_to_topic = zone_to_topic;\n    }\n    \n    \n}\nelse\n{\n    reply_msg.payload = {};\n    reply_msg.payload.type = \"reload\";\n}\n\nreturn [mqtt_msg, reply_msg];    ",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 670,
+        "y": 80,
+        "wires": [
+            [
+                "1d4e8b17.7f5f05",
+                "2e458a71.fed886"
+            ],
+            [
+                "fab4d512.c83828"
+            ]
+        ]
+    },
+    {
+        "id": "1d4e8b17.7f5f05",
+        "type": "mqtt out",
+        "z": "775b9f94.b67a",
+        "name": "Channel Command",
+        "topic": "",
+        "qos": "1",
+        "retain": "",
+        "broker": "f6ee7db8.b87",
+        "x": 970,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "587bdf23.f1fd9",
+        "type": "mqtt in",
+        "z": "775b9f94.b67a",
+        "name": "Channel Status",
+        "topic": "lighting/+/+/status",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "f6ee7db8.b87",
+        "x": 480,
+        "y": 340,
+        "wires": [
+            [
+                "716784c4.390ffc"
+            ]
+        ]
+    },
+    {
+        "id": "716784c4.390ffc",
+        "type": "function",
+        "z": "775b9f94.b67a",
+        "name": "MQTT To Zone Map",
+        "func": "var status_map = flow.get(\"status_map\");\nif (typeof status_map == 'undefined' || status_map === null)\n{\n    status_map = {};\n}\n\n\nvar topic_to_zone = flow.get(\"topic_to_zone\");\nif (typeof topic_to_zone !== 'undefined' && topic_to_zone !== null)\n{\n    if (typeof topic_to_zone[msg.topic] !== 'undefined')\n    {\n        status_map[topic_to_zone[msg.topic]] = msg.payload;\n        flow.set(\"status_map\", status_map);    \n    }\n}\nmsg.payload = {};\nmsg.payload.type = \"status\";\nmsg.payload.status_map = status_map;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 720,
+        "y": 340,
+        "wires": [
+            [
+                "fab4d512.c83828",
+                "4b253021.07fa5"
+            ]
+        ]
+    },
+    {
+        "id": "15951fdf.bfdd3",
+        "type": "function",
+        "z": "775b9f94.b67a",
+        "name": "Fetch Status Map",
+        "func": "if (msg.payload.version == flow.get(\"version\"))\n{\n    var status_map = flow.get(\"status_map\");\n    if (typeof status_map == 'undefined' || status_map === null)\n    {\n        status_map = {};\n    }\n    \n    msg.payload.type = \"status\";\n    msg.payload.status_map = status_map;\n}\nelse\n{\n    msg.payload = {};\n    msg.payload.type = \"reload\";\n    \n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 670,
+        "y": 220,
+        "wires": [
+            [
+                "fab4d512.c83828"
+            ]
+        ]
+    },
+    {
+        "id": "2e458a71.fed886",
+        "type": "debug",
+        "z": "775b9f94.b67a",
+        "name": "Channel Command",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1000,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "20b45542.29473a",
+        "type": "debug",
+        "z": "775b9f94.b67a",
+        "name": "Websocket In",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "2079d0ba.69467",
+        "type": "json",
+        "z": "775b9f94.b67a",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 290,
+        "y": 200,
+        "wires": [
+            [
+                "606b8032.17165",
+                "83f2a030.575d4"
+            ]
+        ]
+    },
+    {
+        "id": "4b253021.07fa5",
+        "type": "debug",
+        "z": "775b9f94.b67a",
+        "name": "Status Map",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "83f2a030.575d4",
+        "type": "debug",
+        "z": "775b9f94.b67a",
+        "name": "JSON Message",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "a9fd8fee.37b68",
+        "type": "mqtt out",
+        "z": "775b9f94.b67a",
+        "name": "Status Request",
+        "topic": "lighting/status_request",
+        "qos": "1",
+        "retain": "true",
+        "broker": "f6ee7db8.b87",
+        "x": 800,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "6caa95ab.a3453c",
+        "type": "websocket-listener",
+        "z": "",
+        "path": "/ws/lighting",
+        "wholemsg": "false"
+    },
+    {
+        "id": "f6ee7db8.b87",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "127.0.0.1",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]
