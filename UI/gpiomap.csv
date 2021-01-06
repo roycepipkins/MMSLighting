@@ -1,0 +1,15 @@
+GPIO_Topic,Zone_Name
+lighting/panel_1/channel_1,CubicalOdds
+lighting/panel_1/channel_2,CubicalEvens
+lighting/panel_1/channel_3,CraftOdds
+lighting/panel_1/channel_4,CraftEvens
+lighting/panel_1/channel_5,SouthWestOdds
+lighting/panel_1/channel_6,SouthWestEvens
+lighting/panel_1/channel_7,MeetingOdds
+lighting/panel_1/channel_8,MeetingEvens
+lighting/panel_1/channel_9,MercantileOdds
+lighting/panel_1/channel_10,MercantileEvens
+lighting/panel_1/channel_11,EastOdds
+lighting/panel_1/channel_12,EastEvens
+lighting/panel_1/channel_13,NorthWestOdds
+lighting/panel_1/channel_14,NorthWestEvens

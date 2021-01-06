@@ -13,8 +13,10 @@
 #include "Timestamp.h"
 
 
-#define DEMO_MAKERSPACE
+#define AT_HOME
 #include "Credentials.h"
+
+#define USE_WIFI 
 
 const int expansion_io_count = 0;
 
@@ -29,7 +31,7 @@ const char topic_prefix[] = "lighting/panel_1";
 const char command_suffix[] = "/command";
 const char status_suffix[] = "/status";
 const char channel_prefix[] = "/channel_";
-const char status_request_topic[] = "/lighting/status_request";
+const char status_request_topic[] = "lighting/status_request";
 
 //Command topics will be topic_prefix + channel_prefix + channel_id + command_suffix
 //E.x.: lighting/panel_1/channel_5/command
@@ -44,6 +46,7 @@ const char status_request_topic[] = "/lighting/status_request";
 const int Wifi_LED = 33;
 const int Mqtt_LED = 32;
 
+String hostname = "ESP32";
 
 
 // Store the MQTT server, username, and password in flash memory.
@@ -64,22 +67,6 @@ void onMQTT(char* topic, byte* payload, unsigned int length);
 WiFiClient client; //Still OK for Ethernet
 PubSubClient pubSub(MQTT_SERVER, MQTT_SERVERPORT, onMQTT, client);
 
-
-
-
-int strincmp(const char* s1, const char* s2, int len)
-{
-  int i;
-  for(i = 0; i < len && s1[i] && s2[i]; ++i)
-  {
-    if ((s1[i] | 32) != (s2[i] | 32))
-    {
-      return 1;
-    }
-  }
-
-  return (!s1[i] && !s2[i] ? 0 : 1);
-}
 
 volatile bool eth_connected = false;
 
@@ -150,15 +137,36 @@ void setup() {
     mcp_io.pinMode(i, OUTPUT);
   }
 
+  
+
+#ifdef USE_WIFI
+// Connect to WiFi access point.
+  Serial.println(); Serial.println();
+  Serial.print("WiFi starting.");
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WLAN_SSID, WLAN_PASS);
+  WiFi.setAutoReconnect(true);
+  while(!WiFi.isConnected())
+  {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.println("\nConnected.");
+  Serial.println(WiFi.localIP().toString());
+
+  hostname = WiFi.getHostname();
+#else
+  
   // Connect to WiFi access point.
   Serial.println(); Serial.println();
   Serial.print("Ethernet starting.");
   WiFi.onEvent(WiFiEvent);
-  ETH.begin();
-  
+  ETH.begin(1);
+
   //With the High Voltage bypass switches, there are no local buttons.
   //With no local buttons, an active network is the only useful state.
   int retries = 30;
+  
   while(!eth_connected)
   {
     delay(1000);
@@ -171,6 +179,11 @@ void setup() {
       ESP.restart();
     }
   }
+
+  hostname = ETH.getHostname();
+#endif
+  
+  
 
 
   ArduinoOTA.onStart([]() {
@@ -191,13 +204,13 @@ void setup() {
     else if (error == OTA_END_ERROR) Serial.println("OTA End Failed");
   });
   
-  ArduinoOTA.setHostname(ETH.getHostname());
+  ArduinoOTA.setHostname(hostname.c_str());
 #ifdef OTA_PASSWORD
   ArduinoOTA.setPassword(OTA_PASSWORD);
 #endif
 
   Serial.println("Connecting to MQTT...");
-  if (pubSub.connect(ETH.getHostname()))
+  if (pubSub.connect(hostname.c_str()))
   {
     Serial.println("Connected to MQTT.");
     subscribeToTopics();
@@ -250,9 +263,15 @@ int payloadToCommand(byte* payload)
   if (payload[0] == '0') return 0;
   if (payload[0] == '1') return 1;
   char* data = (char*)payload;
-  if (strincmp(data, "on", 2) == 0) return 1;
-  if (strincmp(data, "true", 4) == 0) return 1;
-  if (strincmp(data, "high", 4) == 0) return 1;
+  if (strncmp(data, "on", 2) == 0) return 1;
+  if (strncmp(data, "true", 4) == 0) return 1;
+  if (strncmp(data, "high", 4) == 0) return 1;
+  if (strncmp(data, "On", 2) == 0) return 1;
+  if (strncmp(data, "True", 4) == 0) return 1;
+  if (strncmp(data, "High", 4) == 0) return 1;
+  if (strncmp(data, "ON", 2) == 0) return 1;
+  if (strncmp(data, "TRUE", 4) == 0) return 1;
+  if (strncmp(data, "HIGH", 4) == 0) return 1;
   return 0;
 }
 
@@ -272,6 +291,9 @@ void publishAllStatus()
 
 void onMQTT(char* topic, byte* payload, unsigned int length)
 {
+  Serial.print("MQTT Topic: ");
+  Serial.println(topic);
+  
   if (strcmp(status_request_topic, topic) == 0)
   {
     publishAllStatus();
@@ -281,16 +303,17 @@ void onMQTT(char* topic, byte* payload, unsigned int length)
     String subscription_prefix(topic_prefix);
     subscription_prefix += channel_prefix;
     int prefix_len = subscription_prefix.length();
+
   
     if (strlen(topic) > prefix_len && 
-        isdigit(topic[prefix_len] && 
-        length > 0) && 
-        (0 == strincmp(topic, subscription_prefix.c_str(), prefix_len)))
+        isdigit(topic[prefix_len]) && 
+        length > 0 && 
+        (0 == strncmp(topic, subscription_prefix.c_str(), prefix_len)))
     {
       int channel = atoi(&topic[prefix_len]);
       int command = payloadToCommand(payload); 
-      mcp_io.digitalWrite(channel, command);
-      String status = mcp_io.digitalRead(channel) != 0 ? "ON" : "OFF";
+      mcp_io.digitalWrite(channel - 1, command);
+      String status = mcp_io.digitalRead(channel - 1) != 0 ? "ON" : "OFF";
       String status_topic(topic_prefix);
       status_topic += channel_prefix;
       status_topic += channel;
@@ -309,7 +332,7 @@ void onMQTT(char* topic, byte* payload, unsigned int length)
 void reconnectPubSub()
 {
   Serial.println("Reconnecting to MQTT Server...");
-  if (pubSub.connect(ETH.getHostname()))
+  if (pubSub.connect(hostname.c_str()))
   {
     Serial.println("Connected to MQTT Server");
     subscribeToTopics();
@@ -324,7 +347,11 @@ void reconnectPubSub()
 
 void loop()
 {
+#ifdef USE_WIFI
+  if (WiFi.isConnected())
+#else
   if (eth_connected)
+#endif
   {
     disconnect_counter = connection_retries;
     ArduinoOTA.handle();
