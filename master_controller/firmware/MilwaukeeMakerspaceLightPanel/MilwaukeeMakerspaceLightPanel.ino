@@ -11,12 +11,12 @@
 #include "MCP_IO.h"
 
 #include "Timestamp.h"
-
+#include <algorithm>
 
 #define AT_HOME
 #include "Credentials.h"
 
-#define USE_WIFI 
+//#define USE_WIFI 
 
 const int expansion_io_count = 0;
 
@@ -27,7 +27,7 @@ const int expansion_io_count = 0;
 //EDIT values below for the correct panel number, etc 
 //TODO you should probably take the number from an input on the board. A 4 bit DIP or something.
 
-const char topic_prefix[] = "lighting/panel_1";
+const char topic_prefix[] = "lighting/panel_1a";
 const char command_suffix[] = "/command";
 const char status_suffix[] = "/status";
 const char channel_prefix[] = "/channel_";
@@ -156,12 +156,18 @@ void setup() {
 
   hostname = WiFi.getHostname();
 #else
+  delay(1000);
+  pinMode(16, OUTPUT);
+  digitalWrite(16, LOW);
+  delay(1000);
+  digitalWrite(16, HIGH);
+  delay(1000);
   
-  // Connect to WiFi access point.
+  
   Serial.println(); Serial.println();
   Serial.print("Ethernet starting.");
   WiFi.onEvent(WiFiEvent);
-  ETH.begin(1);
+  
 
   //With the High Voltage bypass switches, there are no local buttons.
   //With no local buttons, an active network is the only useful state.
@@ -169,9 +175,10 @@ void setup() {
   
   while(!eth_connected)
   {
-    delay(1000);
+    delay(2000);
+    ETH.begin(1, -1, 23, 18, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
     Serial.print(".");
-    if (retries == 0)
+    if (--retries == 0)
     {
       Serial.println("");
       Serial.println("Ethernet didn't start in time. Restarting in five seconds.");
@@ -293,6 +300,12 @@ void onMQTT(char* topic, byte* payload, unsigned int length)
 {
   Serial.print("MQTT Topic: ");
   Serial.println(topic);
+
+  char txt[41] = {0};
+  strncpy(txt, (char*) payload, std::min((int)length, 40));
+  Serial.print("MQTT Payload: [");
+  Serial.print(txt);
+  Serial.println("]");
   
   if (strcmp(status_request_topic, topic) == 0)
   {
@@ -324,7 +337,12 @@ void onMQTT(char* topic, byte* payload, unsigned int length)
       Serial.print("Commanded Channel ");
       Serial.print(channel);
       Serial.print(" to ");
-      Serial.println(command);
+      Serial.print(command);
+
+      Serial.print("Published topic: ");
+      Serial.print(status_topic);
+      Serial.print(" payload: ");
+      Serial.println(status);
     }
   } 
 }

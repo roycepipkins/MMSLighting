@@ -16,8 +16,8 @@
 
 
 
-const int Wifi_LED = 33;
-const int Mqtt_LED = 32;
+const int Wifi_LED = 12;
+const int Mqtt_LED = 2;
 
 
 
@@ -57,7 +57,7 @@ void setup() {
   pinMode(13, OUTPUT);
   //pinMode(4, INPUT);
 
-  spi.begin(13, 4, 3);
+  spi.begin(15, 35, 4);
   spi.setFrequency(10000);
   //spi.setBitOrder(MSBFIRST);          // Sets SPI bus bit order (this is the default, setting it for good form!)
   //spi.setDataMode(SPI_MODE0); 

@@ -1,4 +1,4 @@
-var version = 2;
+var version = 3;
 var ON_COLOR = "#ffff00";
 var OFF_COLOR = "#444444";
 var ws = null;
@@ -117,11 +117,27 @@ function connectWebSocket()
 	}
 }
 
+function onAllOff(evt)
+{
+	document.querySelectorAll('.LightSwitch').forEach((currentValue, currentIndex, listObj) =>
+	{
+		var command = {};
+		command.version = version;
+		command.type = "command"
+		command.zone = currentValue.id;
+		command.command = "OFF";
+		ws.sendMessage(command);
+	});
+}
 
 window.addEventListener('DOMContentLoaded', () => {
 	document.querySelectorAll('.LightSwitch').forEach((currentValue, currentIndex, listObj) =>
 	{
 		currentValue.addEventListener('click', onClick);
 	});
+	
+	var allOff = document.getElementById('AllOff');
+	allOff.addEventListener('click', onAllOff);
+	
 	connectWebSocket();
 });
