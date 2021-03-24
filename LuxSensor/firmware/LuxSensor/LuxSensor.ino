@@ -2,11 +2,11 @@
 #include "ESP8266WiFi.h"
 #include <PubSubClient.h>
 #include "Credentials.h"
-#include "WiFiManager.h"
+//#include "WiFiManager.h"
 #include <EEPROM.h>
 #include "Timestamp.h"
 
-WiFiManager wifiManager;
+//WiFiManager wifiManager;
 
 Adafruit_VEML7700 veml = Adafruit_VEML7700();
 const int Wifi_LED = 16;
@@ -18,7 +18,7 @@ void onMQTT(char* topic, byte* payload, unsigned int length);
 WiFiClient client; //Still OK for Ethernet
 PubSubClient pubSub(MQTT_SERVER, MQTT_SERVERPORT, onMQTT, client);
 
-char host[40];
+char host[40] = "ds1";
 char mqtt_server[40];
 char mqtt_port[6]  = "1883";
 bool configSaveNeeded = false;
@@ -121,7 +121,7 @@ void saveConfigCallback () {
   configSaveNeeded = true;
 }
 
-void runWifiManager()
+/*void runWifiManager()
 {
   uint32_t first_run = 0;
   int offset = 0;
@@ -184,7 +184,7 @@ void runWifiManager()
   }
 
   EEPROM.end();
-}
+}*/
 
 void setup() {
 
@@ -194,10 +194,12 @@ void setup() {
   digitalWrite(Mqtt_LED, LOW);
 
   Serial.begin(115200);
+  Serial.println(); Serial.println();
   Serial.println("Lux Sensor v1.0");
 
-  runWifiManager();
-  digitalWrite(Wifi_LED, HIGH);
+  
+  //runWifiManager();
+  //digitalWrite(Wifi_LED, HIGH);
 
   
   Wire.begin(12, 13);
@@ -233,14 +235,24 @@ void setup() {
   }
 
   Serial.println(); Serial.println();
+  Serial.print("SSID: ");
+  Serial.println(WLAN_SSID);
   Serial.print("WiFi starting.");
   WiFi.mode(WIFI_STA);
-  WiFi.begin(WLAN_SSID, WLAN_PASS);
   WiFi.setAutoReconnect(true);
+  WiFi.begin(WLAN_SSID, WLAN_PASS);
+  
+  Timestamp initialWifiConnect;
   while(!WiFi.isConnected())
   {
     delay(1000);
     Serial.print(".");
+    if (initialWifiConnect.Elapsed() > 10000)
+    {
+      Serial.println("Too long to connect. Restarting");
+      delay(2000);
+      ESP.restart();
+    }
   }
   Serial.println("\nConnected.");
   Serial.println(WiFi.localIP().toString());
