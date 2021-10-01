@@ -1,0 +1,282 @@
+substitutions:
+    panel: panel_1a
+
+esphome:
+  name: $panel
+  platform: ESP32
+  board: esp32-poe
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${panel} Fallback Hotspot"
+    password: !secret ap_password
+
+captive_portal:
+
+# Enable logging
+logger:
+
+
+ota:
+  password: !secret ota_password
+
+mqtt:
+  broker: 10.4.32.10
+  topic_prefix: "lighting/${panel}"
+  id: mqtt_client
+  on_message:
+    topic: lighting/status_request
+    qos: 1
+    then:
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_1/state"
+            payload: !lambda |-
+                return id(channel_1).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_2/state"
+            payload: !lambda |-
+                return id(channel_2).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_3/state"
+            payload: !lambda |-
+                return id(channel_3).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_4/state"
+            payload: !lambda |-
+                return id(channel_4).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_5/state"
+            payload: !lambda |-
+                return id(channel_5).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_6/state"
+            payload: !lambda |-
+                return id(channel_6).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_7/state"
+            payload: !lambda |-
+                return id(channel_7).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_8/state"
+            payload: !lambda |-
+                return id(channel_8).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_9/state"
+            payload: !lambda |-
+                return id(channel_9).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_10/state"
+            payload: !lambda |-
+                return id(channel_10).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_11/state"
+            payload: !lambda |-
+                return id(channel_11).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_12/state"
+            payload: !lambda |-
+                return id(channel_12).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_13/state"
+            payload: !lambda |-
+                return id(channel_13).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_14/state"
+            payload: !lambda |-
+                return id(channel_14).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_15/state"
+            payload: !lambda |-
+                return id(channel_15).state ? "ON" : "OFF";
+        - mqtt.publish:
+            topic:  "lighting/${panel}/switch/channel_16/state"
+            payload: !lambda |-
+                return id(channel_16).state ? "ON" : "OFF";
+spi:
+  clk_pin: GPIO13
+  mosi_pin: GPIO3
+  miso_pin: GPIO4  
+  
+mcp23s17:
+  - id: 'mcp23s17_hub'
+    cs_pin: GPIO14
+    deviceaddress: 0
+    
+switch:
+  - platform: gpio
+    name: "channel_1"
+    id: channel_1
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 0
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_2"
+    id: channel_2
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 1
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_3"
+    id: channel_3
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 2
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_4"
+    id: channel_4
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 3
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_5"
+    id: channel_5
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 4
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_6"
+    id: channel_6
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 5
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_7"
+    id: channel_7
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 6
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_8"
+    id: channel_8
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 7
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_9"
+    id: channel_9
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 8
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_10"
+    id: channel_10
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 9
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_11"
+    id: channel_11
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 10
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_12"
+    id: channel_12
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 11
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_13"
+    id: channel_13
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 12
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_14"
+    id: channel_14
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 13
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_15"
+    id: channel_15
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 14
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "channel_16"
+    id: channel_16
+    pin:
+      mcp23xxx: mcp23s17_hub
+      number: 15
+      mode: OUTPUT
+      inverted: false
+  - platform: gpio
+    name: "Net Light"
+    id: net_light
+    pin: 33
+    internal: true
+  - platform: gpio
+    name: "MQTT Light"
+    id: mqtt_light
+    pin: 32
+    internal: true
+
+
+interval:
+    - interval: 2s
+      then:
+        - if:
+            condition:
+                wifi.connected:
+            then:
+                if: 
+                    condition:
+                        switch.is_off: net_light
+                    then:
+                        switch.turn_on: net_light
+            else:
+                if: 
+                    condition:
+                        switch.is_on: net_light
+                    then:
+                        switch.turn_off: net_light
+        - if:
+            condition:
+                mqtt.connected:
+            then:
+                if: 
+                    condition:
+                        switch.is_off: mqtt_light
+                    then:
+                        switch.turn_on: mqtt_light
+            else:
+                if: 
+                    condition:
+                        switch.is_on: mqtt_light
+                    then:
+                        switch.turn_off: mqtt_light
