@@ -1,5 +1,5 @@
 substitutions:
-    panel: panel_1a
+    panel: panel_1c
 
 esphome:
   name: $panel
@@ -178,7 +178,7 @@ switch:
       mcp23xxx: mcp23s17_hub
       number: 8
       mode: OUTPUT
-      inverted: true
+      inverted: false
   - platform: gpio
     name: "channel_10"
     id: channel_10
@@ -186,7 +186,7 @@ switch:
       mcp23xxx: mcp23s17_hub
       number: 9
       mode: OUTPUT
-      inverted: true
+      inverted: false
   - platform: gpio
     name: "channel_11"
     id: channel_11
@@ -194,7 +194,7 @@ switch:
       mcp23xxx: mcp23s17_hub
       number: 10
       mode: OUTPUT
-      inverted: true
+      inverted: false
   - platform: gpio
     name: "channel_12"
     id: channel_12
