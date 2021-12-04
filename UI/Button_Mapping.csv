@@ -1,0 +1,6 @@
+Button_Device_MQTT_Prefix,Button,Channel_A_MQTT_Prefix,Channel_B_MQTT_Prefix,Composite_State
+lighting/buttons/atom_01,a,lighting/panel_1a/switch/channel_8,lighting/panel_1a/switch/channel_9,Meeting_Room
+lighting/buttons/atom_02,a,lighting/panel_1a/switch/channel_8,lighting/panel_1a/switch/channel_9,Meeting_Room
+lighting/buttons/atom_03,a,lighting/panel_1a/switch/channel_10,lighting/panel_1a/switch/channel_11,Basement
+lighting/buttons/atom_04,a,lighting/panel_1c/switch/channel_2,lighting/panel_1c/switch/channel_4,Forge
+lighting/buttons/atom_05,a,lighting/panel_1c/switch/channel_6,lighting/panel_1c/switch/channel_8,Welding
