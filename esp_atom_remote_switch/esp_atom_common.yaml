@@ -1,12 +1,12 @@
 substitutions:
-  deviceName: "atom_05"
+  deviceName: "override deviceName from cmdline (-s deviceName <put deviceName value here>)"
   mqtt_topic_prefix: "lighting/buttons/${deviceName}"
 
 esphome:
   name: $deviceName
   platform: ESP32
   board: pico32
-
+  
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
@@ -113,6 +113,7 @@ binary_sensor:
 light:
   - platform: neopixelbus
     type: GRB
+    variant: 800KBPS
     pin: 27
     num_leds: 1
     name: "NeoPixel"
