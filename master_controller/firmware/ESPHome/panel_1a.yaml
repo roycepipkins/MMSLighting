@@ -30,8 +30,8 @@ ota:
 
 mqtt:
   broker: !secret mqtt_broker
-  username: !secret mqtt_username
-  password: !secret mqtt_password
+#  username: !secret mqtt_username
+#  password: !secret mqtt_password
   topic_prefix: "lighting/${panel}"
   id: mqtt_client
   on_message:
