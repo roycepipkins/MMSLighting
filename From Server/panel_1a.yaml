@@ -25,13 +25,10 @@ logger:
 
 
 ota:
-    - platform: esphome
-      password: !secret ota_password
+  password: !secret ota_password
 
 mqtt:
   broker: !secret mqtt_broker
-  username: !secret mqtt_username
-  password: !secret mqtt_password
   topic_prefix: "lighting/${panel}"
   id: mqtt_client
   on_message:

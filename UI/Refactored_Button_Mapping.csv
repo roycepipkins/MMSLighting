@@ -1,0 +1,104 @@
+﻿Button_Device_MQTT_Prefix,Button,Action,Channel_Prefix,Comment
+lighting/buttons/atom-01,a,SingleClick,lighting/panel_1a/switch/channel_8,Meeting Room
+lighting/buttons/atom-01,a,SingleClick,lighting/panel_1a/switch/channel_9,Meeting Room
+lighting/buttons/atom-01,a,DoubleClick,lighting/panel_1a/switch/channel_8,Meeting Room
+lighting/buttons/atom-01,a,LongClick,lighting/panel_1a/switch/channel_9,Meeting Room
+lighting/buttons/atom-02,a,SingleClick,lighting/panel_1a/switch/channel_8,Meeting Room
+lighting/buttons/atom-02,a,SingleClick,lighting/panel_1a/switch/channel_9,Meeting Room
+lighting/buttons/atom-02,a,DoubleClick,lighting/panel_1a/switch/channel_8,Meeting Room
+lighting/buttons/atom-02,a,LongClick,lighting/panel_1a/switch/channel_9,Meeting Room
+lighting/buttons/atom-03,a,SingleClick,lighting/panel_1a/switch/channel_10,North Basement
+lighting/buttons/atom-03,a,SingleClick,lighting/panel_1a/switch/channel_11,South Basement West
+lighting/buttons/atom-03,a,SingleClick,lighting/panel_1a/switch/channel_12,South Basement East
+lighting/buttons/atom-03,a,DoubleClick,lighting/panel_1a/switch/channel_10,North Basement
+lighting/buttons/atom-03,a,LongClick,lighting/panel_1a/switch/channel_11,South Basement
+lighting/buttons/atom-04,a,SingleClick,lighting/panel_1c/switch/channel_2,Forge
+lighting/buttons/atom-04,a,SingleClick,lighting/panel_1c/switch/channel_4,Forge
+lighting/buttons/atom-04,a,DoubleClick,lighting/panel_1c/switch/channel_2,Forge
+lighting/buttons/atom-04,a,LongClick,lighting/panel_1c/switch/channel_4,Forge
+lighting/buttons/atom-05,a,SingleClick,lighting/panel_1c/switch/channel_6,Welding
+lighting/buttons/atom-05,a,SingleClick,lighting/panel_1c/switch/channel_8,Welding
+lighting/buttons/atom-05,a,DoubleClick,lighting/panel_1c/switch/channel_6,Welding
+lighting/buttons/atom-05,a,LongClick,lighting/panel_1c/switch/channel_8,Welding
+lighting/buttons/atom-06,a,SingleClick,lighting/panel_1a/switch/channel_8,Meeting Room
+lighting/buttons/atom-06,a,SingleClick,lighting/panel_1a/switch/channel_9,Meeting Room
+lighting/buttons/atom-06,a,DoubleClick,lighting/panel_1a/switch/channel_8,Meeting Room
+lighting/buttons/atom-06,a,LongClick,lighting/panel_1a/switch/channel_9,Meeting Room
+lighting/buttons/atom-07,a,SingleClick,lighting/panel_1c/switch/channel_12,Mercantile
+lighting/buttons/atom-07,a,SingleClick,lighting/panel_1c/switch/channel_13,Mercantile
+lighting/buttons/atom-07,a,DoubleClick,lighting/panel_1c/switch/channel_12,Mercantile
+lighting/buttons/atom-07,a,LongClick,lighting/panel_1c/switch/channel_13,Mercantile
+lighting/buttons/atom-08,a,SingleClick,lighting/panel_1a/switch/channel_4,Craft
+lighting/buttons/atom-08,a,SingleClick,lighting/panel_1a/switch/channel_6,Craft
+lighting/buttons/atom-08,a,DoubleClick,lighting/panel_1a/switch/channel_4,Craft
+lighting/buttons/atom-08,a,LongClick,lighting/panel_1a/switch/channel_6,Craft
+lighting/buttons/atom-09,a,SingleClick,lighting/panel_1a/switch/channel_4,Craft
+lighting/buttons/atom-09,a,SingleClick,lighting/panel_1a/switch/channel_6,Craft
+lighting/buttons/atom-09,a,DoubleClick,lighting/panel_1a/switch/channel_4,Craft
+lighting/buttons/atom-09,a,LongClick,lighting/panel_1a/switch/channel_6,Craft
+lighting/buttons/atom-10,a,SingleClick,lighting/panel_1a/switch/channel_4,Craft
+lighting/buttons/atom-10,a,SingleClick,lighting/panel_1a/switch/channel_6,Craft
+lighting/buttons/atom-10,a,DoubleClick,lighting/panel_1a/switch/channel_4,Craft
+lighting/buttons/atom-10,a,LongClick,lighting/panel_1a/switch/channel_6,Craft
+lighting/buttons/atom-11,a,SingleClick,lighting/panel_1a/switch/channel_2,Cubicals 1st Floor
+lighting/buttons/atom-11,a,SingleClick,lighting/panel_1a/switch/channel_3,Cubicals 1st Floor
+lighting/buttons/atom-11,a,DoubleClick,lighting/panel_1a/switch/channel_2,Cubicals 1st Floor
+lighting/buttons/atom-11,a,LongClick,lighting/panel_1a/switch/channel_3,Cubicals 1st Floor
+lighting/buttons/atom-12,a,SingleClick,lighting/panel_1a/switch/channel_2,Cubicals 1st Floor
+lighting/buttons/atom-12,a,SingleClick,lighting/panel_1a/switch/channel_3,Cubicals 1st Floor
+lighting/buttons/atom-12,a,DoubleClick,lighting/panel_1a/switch/channel_2,Cubicals 1st Floor
+lighting/buttons/atom-12,a,LongClick,lighting/panel_1a/switch/channel_3,Cubicals 1st Floor
+lighting/buttons/atom-13,a,SingleClick,lighting/panel_1a/switch/channel_2,Cubicals 1st Floor
+lighting/buttons/atom-13,a,SingleClick,lighting/panel_1a/switch/channel_3,Cubicals 1st Floor
+lighting/buttons/atom-13,a,DoubleClick,lighting/panel_1a/switch/channel_2,Cubicals 1st Floor
+lighting/buttons/atom-13,a,LongClick,lighting/panel_1a/switch/channel_3,Cubicals 1st Floor
+lighting/buttons/atom-14,a,SingleClick,lighting/panel_1b/switch/channel_5,West Hall Mid Bay North
+lighting/buttons/atom-14,a,SingleClick,lighting/panel_1b/switch/channel_6,West Hall East Bay North
+lighting/buttons/atom-14,a,DoubleClick,lighting/panel_1b/switch/channel_5,West Hall Mid Bay North
+lighting/buttons/atom-14,a,LongClick,lighting/panel_1b/switch/channel_6,West Hall East Bay North
+lighting/buttons/atom-15,a,SingleClick,lighting/panel_1b/switch/channel_5,West Hall Mid Bay North
+lighting/buttons/atom-15,a,SingleClick,lighting/panel_1b/switch/channel_6,West Hall East Bay North
+lighting/buttons/atom-15,a,DoubleClick,lighting/panel_1b/switch/channel_5,West Hall Mid Bay North
+lighting/buttons/atom-15,a,LongClick,lighting/panel_1b/switch/channel_6,West Hall East Bay North
+lighting/buttons/atom-16,a,SingleClick,lighting/panel_1b/switch/channel_5,West Hall Mid Bay North
+lighting/buttons/atom-16,a,SingleClick,lighting/panel_1b/switch/channel_6,West Hall East Bay North
+lighting/buttons/atom-16,a,DoubleClick,lighting/panel_1b/switch/channel_5,West Hall Mid Bay North
+lighting/buttons/atom-16,a,LongClick,lighting/panel_1b/switch/channel_6,West Hall East Bay North
+lighting/buttons/atom-17,a,SingleClick,lighting/panel_1b/switch/channel_5,West Hall Mid Bay North
+lighting/buttons/atom-18,a,SingleClick,lighting/panel_1b/switch/channel_6,West Hall East Bay North
+lighting/buttons/atom-19,a,SingleClick,lighting/panel_1b/switch/channel_2,West Hall West Bay
+lighting/buttons/atom-19,a,SingleClick,lighting/panel_1b/switch/channel_3,West Hall West Bay
+lighting/buttons/atom-19,a,DoubleClick,lighting/panel_1b/switch/channel_2,West Hall West Bay
+lighting/buttons/atom-19,a,LongClick,lighting/panel_1b/switch/channel_3,West Hall West Bay
+lighting/buttons/atom-20,a,SingleClick,lighting/panel_1b/switch/channel_2,West Hall West Bay
+lighting/buttons/atom-20,a,SingleClick,lighting/panel_1b/switch/channel_3,West Hall West Bay
+lighting/buttons/atom-20,a,DoubleClick,lighting/panel_1b/switch/channel_2,West Hall West Bay
+lighting/buttons/atom-20,a,LongClick,lighting/panel_1b/switch/channel_3,West Hall West Bay
+lighting/buttons/atom-21,a,SingleClick,lighting/panel_1b/switch/channel_4,West Hall Mid & East Bay South
+lighting/buttons/atom-21,a,SingleClick,lighting/panel_1b/switch/channel_7,West Hall Mid & East Bay South
+lighting/buttons/atom-21,a,DoubleClick,lighting/panel_1b/switch/channel_4,West Hall Mid & East Bay South
+lighting/buttons/atom-21,a,LongClick,lighting/panel_1b/switch/channel_7,West Hall Mid & East Bay South
+lighting/buttons/atom-22,a,SingleClick,lighting/panel_1b/switch/channel_4,West Hall Mid & East Bay South
+lighting/buttons/atom-22,a,SingleClick,lighting/panel_1b/switch/channel_7,West Hall Mid & East Bay South
+lighting/buttons/atom-22,a,DoubleClick,lighting/panel_1b/switch/channel_4,West Hall Mid & East Bay South
+lighting/buttons/atom-22,a,LongClick,lighting/panel_1b/switch/channel_7,West Hall Mid & East Bay South
+lighting/buttons/atom-23,a,SingleClick,lighting/panel_1c/switch/channel_2,Forge
+lighting/buttons/atom-23,a,SingleClick,lighting/panel_1c/switch/channel_4,Forge
+lighting/buttons/atom-23,a,DoubleClick,lighting/panel_1c/switch/channel_2,Forge
+lighting/buttons/atom-23,a,LongClick,lighting/panel_1c/switch/channel_4,Forge
+lighting/buttons/atom-24,a,SingleClick,lighting/panel_1c/switch/channel_9,East Hall South East Bay
+lighting/buttons/atom-24,a,SingleClick,lighting/panel_1c/switch/channel_10,East Hall South East Bay
+lighting/buttons/atom-24,a,DoubleClick,lighting/panel_1c/switch/channel_9,East Hall South East Bay
+lighting/buttons/atom-24,a,LongClick,lighting/panel_1c/switch/channel_10,East Hall South East Bay
+lighting/buttons/atom-25,a,SingleClick,lighting/panel_1c/switch/channel_1,East Hall West Bay North
+lighting/buttons/atom-25,a,SingleClick,lighting/panel_1c/switch/channel_3,East Hall West Bay North
+lighting/buttons/atom-25,a,DoubleClick,lighting/panel_1c/switch/channel_1,East Hall West Bay North
+lighting/buttons/atom-25,a,LongClick,lighting/panel_1c/switch/channel_3,East Hall West Bay North
+lighting/buttons/atom-26,a,SingleClick,lighting/panel_1c/switch/channel_5,East Hall East Bay North
+lighting/buttons/atom-26,a,SingleClick,lighting/panel_1c/switch/channel_7,East Hall East Bay North
+lighting/buttons/atom-26,a,DoubleClick,lighting/panel_1c/switch/channel_5,East Hall East Bay North
+lighting/buttons/atom-26,a,LongClick,lighting/panel_1c/switch/channel_7,East Hall East Bay North
+lighting/buttons/atom-27,a,SingleClick,lighting/panel_1c/switch/channel_12,Mercantile
+lighting/buttons/atom-27,a,SingleClick,lighting/panel_1c/switch/channel_13,Mercantile
+lighting/buttons/atom-27,a,DoubleClick,lighting/panel_1c/switch/channel_12,Mercantile
+lighting/buttons/atom-27,a,LongClick,lighting/panel_1c/switch/channel_13,Mercantile

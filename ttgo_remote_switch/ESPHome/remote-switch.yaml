@@ -1,5 +1,5 @@
 substitutions:
-  deviceName: "remote_switch_1"
+  deviceName: "use a command line override to set the deviceName and the zone e.g. -s deviceName the-name -s zone 5"
   zone: "1"
 
 esphome:
@@ -125,7 +125,7 @@ binary_sensor:
       then:
         - mqtt.publish:
             topic: "Lighting/LZ${zone}_Cmd"
-            payload: "On"
+            payload: "Off"
             qos: 1
   - platform: gpio
     name: "C Button"
@@ -136,6 +136,6 @@ binary_sensor:
       then:
         - mqtt.publish:
             topic: "Lighting/LZ${zone}_Cmd"
-            payload: "Off"
+            payload: "On"
             qos: 1
 
